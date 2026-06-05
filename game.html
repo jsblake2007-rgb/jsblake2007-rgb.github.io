@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<title>Flappy Bull</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #06070d;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+}
+
+#game-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+canvas {
+  display: block;
+  border-radius: 16px;
+  box-shadow:
+    0 0 0 2px rgba(200,16,46,0.4),
+    0 0 60px rgba(200,16,46,0.2),
+    0 30px 80px rgba(0,0,0,0.8);
+}
+
+#hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0 4px;
+}
+
+.hud-item {
+  font-size: .72rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+}
+
+.hud-val {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: .04em;
+}
+
+#back-link {
+  position: fixed;
+  top: 16px; left: 16px;
+  font-size: .72rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.25);
+  text-decoration: none;
+  transition: color .3s;
+}
+#back-link:hover { color: rgba(200,16,46,0.8); }
+</style>
+</head>
+<body>
+
+<a href="redbull.html" id="back-link">← Red Bull</a>
+
+<div id="game-wrap">
+  <div id="hud">
+    <div class="hud-item">Score <span class="hud-val" id="hud-score">0</span></div>
+    <div class="hud-item">Best &nbsp;<span class="hud-val" id="hud-best">0</span></div>
+  </div>
+  <canvas id="c"></canvas>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   FLAPPY BULL — Red Bull themed Flappy Bird clone
+   Controls: Tap / Click / Space / Arrow Up
+═══════════════════════════════════════════════════════════ */
+
+const canvas = document.getElementById('c');
+const ctx    = canvas.getContext('2d');
+
+// ── Responsive sizing ──────────────────────────────────────
+const MAX_W = 400, MAX_H = 600;
+function resize() {
+  const vw = window.innerWidth, vh = window.innerHeight - 80;
+  const scale = Math.min(1, vw / MAX_W, vh / MAX_H);
+  canvas.width  = Math.floor(MAX_W * scale);
+  canvas.height = Math.floor(MAX_H * scale);
+  S = canvas.width / MAX_W; // global scale factor
+}
+let S = 1;
+resize();
+window.addEventListener('resize', () => { resize(); if (state !== 'PLAY') drawIdle(); });
+
+// ── Constants (logical units, multiply by S for pixels) ───
+const W = MAX_W, H = MAX_H;
+const GRAV       = 0.38;
+const JUMP_VEL   = -7.2;
+const PIPE_W     = 56;
+const PIPE_GAP   = 148;
+const PIPE_SPEED = 2.4;
+const PIPE_FREQ  = 90;  // frames between new pipes
+const CAN_X      = 80;
+const CAN_W      = 34;
+const CAN_H      = 54;
+
+// ── State ──────────────────────────────────────────────────
+let state = 'IDLE'; // IDLE | PLAY | DEAD
+let vy, canY, pipes, score, frame, particles, flashTimer;
+let best = parseInt(localStorage.getItem('flappybull_best') || '0');
+
+// ── Audio (Web Audio API) ──────────────────────────────────
+const AC = new (window.AudioContext || window.webkitAudioContext)();
+
+function playTone(freq, type, dur, vol = 0.3) {
+  if (AC.state === 'suspended') AC.resume();
+  const osc  = AC.createOscillator();
+  const gain = AC.createGain();
+  osc.connect(gain); gain.connect(AC.destination);
+  osc.type = type; osc.frequency.setValueAtTime(freq, AC.currentTime);
+  gain.gain.setValueAtTime(vol, AC.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, AC.currentTime + dur);
+  osc.start(); osc.stop(AC.currentTime + dur);
+}
+
+function sfxFlap()  { playTone(420, 'square', .08, .15); }
+function sfxScore() {
+  playTone(660, 'sine', .08, .2);
+  setTimeout(() => playTone(880, 'sine', .12, .2), 80);
+}
+function sfxDie() {
+  playTone(200, 'sawtooth', .3, .25);
+  setTimeout(() => playTone(130, 'sawtooth', .4, .2), 100);
+}
+
+// ── Init ───────────────────────────────────────────────────
+function init() {
+  vy         = 0;
+  canY       = H / 2 - CAN_H / 2;
+  pipes      = [];
+  score      = 0;
+  frame      = 0;
+  particles  = [];
+  flashTimer = 0;
+  document.getElementById('hud-score').textContent = 0;
+}
+
+// ── Pipe factory ───────────────────────────────────────────
+function newPipe() {
+  const minTop = 60, maxTop = H - PIPE_GAP - 60;
+  const topH = minTop + Math.random() * (maxTop - minTop);
+  return { x: W, topH, passed: false };
+}
+
+// ── Particle burst ─────────────────────────────────────────
+function burst(x, y, color, n = 18) {
+  for (let i = 0; i < n; i++) {
+    const ang = (i / n) * Math.PI * 2 + Math.random() * .4;
+    const spd = 2 + Math.random() * 4;
+    particles.push({
+      x, y,
+      vx: Math.cos(ang) * spd,
+      vy: Math.sin(ang) * spd - 2,
+      life: 1,
+      decay: .025 + Math.random() * .025,
+      r: 2 + Math.random() * 3,
+      color
+    });
+  }
+}
+
+// ── Background ─────────────────────────────────────────────
+let bgStars = [];
+(function initStars() {
+  for (let i = 0; i < 80; i++) bgStars.push({
+    x: Math.random() * W, y: Math.random() * H,
+    r: Math.random() * 1.3 + .2,
+    a: Math.random(),
+    phase: Math.random() * Math.PI * 2
+  });
+})();
+
+let bgT = 0;
+function drawBg() {
+  bgT += .012;
+  // Sky gradient
+  const g = ctx.createLinearGradient(0, 0, 0, H * S);
+  g.addColorStop(0,   '#03040e');
+  g.addColorStop(.5,  '#08091a');
+  g.addColorStop(1,   '#0f1028');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W*S, H*S);
+
+  // Stars
+  bgStars.forEach(s => {
+    const a = .12 + .12 * Math.sin(bgT * 1.2 + s.phase);
+    ctx.beginPath();
+    ctx.arc(s.x*S, s.y*S, s.r*S, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(200,220,255,${a})`;
+    ctx.fill();
+  });
+
+  // Ground
+  const gg = ctx.createLinearGradient(0, (H-40)*S, 0, H*S);
+  gg.addColorStop(0, '#1a0408');
+  gg.addColorStop(1, '#0d0206');
+  ctx.fillStyle = gg;
+  ctx.fillRect(0, (H-40)*S, W*S, 40*S);
+
+  // Ground line glow
+  ctx.strokeStyle = 'rgba(200,16,46,0.6)';
+  ctx.lineWidth = 1.5 * S;
+  ctx.beginPath();
+  ctx.moveTo(0, (H-40)*S);
+  ctx.lineTo(W*S, (H-40)*S);
+  ctx.stroke();
+
+  // Moving ground dashes
+  const dashW = 30, dashGap = 20, total = dashW + dashGap;
+  const offset = (bgT * 60 * PIPE_SPEED / 1.5) % total;
+  ctx.fillStyle = 'rgba(200,16,46,0.25)';
+  for (let x = -total + offset; x < W; x += total) {
+    ctx.fillRect(x*S, (H-34)*S, dashW*S, 3*S);
+  }
+}
+
+// ── Draw pipe ──────────────────────────────────────────────
+function drawPipe(pipe) {
+  const x  = pipe.x;
+  const tw = PIPE_W;
+  const bY = pipe.topH + PIPE_GAP; // bottom pipe top
+  const bH = H - 40 - bY;
+
+  // Top pipe
+  drawPipeBody(x, 0, tw, pipe.topH);
+  // Cap (top pipe) — at bottom of top pipe
+  drawPipeCap(x - 4, pipe.topH - 22, tw + 8, 22, 'top');
+
+  // Bottom pipe
+  drawPipeBody(x, bY, tw, bH);
+  // Cap (bottom pipe) — at top of bottom pipe
+  drawPipeCap(x - 4, bY, tw + 8, 22, 'bottom');
+}
+
+function drawPipeBody(x, y, w, h) {
+  ctx.save();
+  // Main body gradient
+  const g = ctx.createLinearGradient(x*S, 0, (x+w)*S, 0);
+  g.addColorStop(0,   '#002060');
+  g.addColorStop(.3,  '#0046b4');
+  g.addColorStop(.6,  '#003090');
+  g.addColorStop(1,   '#001840');
+  ctx.fillStyle = g;
+  // Slightly rounded
+  roundRect(x*S, y*S, w*S, h*S, 3*S);
+  ctx.fill();
+
+  // Red Bull stripe
+  ctx.fillStyle = 'rgba(200,16,46,0.6)';
+  ctx.fillRect((x+4)*S, y*S, 4*S, h*S);
+  ctx.fillRect((x+w-8)*S, y*S, 4*S, h*S);
+
+  // Shine
+  const shine = ctx.createLinearGradient(x*S, 0, (x+w)*S, 0);
+  shine.addColorStop(0,    'rgba(255,255,255,0)');
+  shine.addColorStop(.25,  'rgba(255,255,255,0.08)');
+  shine.addColorStop(.5,   'rgba(255,255,255,0)');
+  ctx.fillStyle = shine;
+  ctx.fillRect(x*S, y*S, w*S, h*S);
+  ctx.restore();
+}
+
+function drawPipeCap(x, y, w, h, dir) {
+  ctx.save();
+  const g = ctx.createLinearGradient(x*S, 0, (x+w)*S, 0);
+  g.addColorStop(0,   '#001840');
+  g.addColorStop(.3,  '#0055cc');
+  g.addColorStop(.7,  '#003aaa');
+  g.addColorStop(1,   '#001030');
+  ctx.fillStyle = g;
+  const r = dir === 'top' ? [0,0,6,6] : [6,6,0,0];
+  ctx.beginPath();
+  ctx.moveTo((x + r[0])*S, y*S);
+  ctx.lineTo((x+w - r[1])*S, y*S);
+  ctx.quadraticCurveTo((x+w)*S, y*S, (x+w)*S, (y+r[1])*S);
+  ctx.lineTo((x+w)*S, (y+h - r[3])*S);
+  ctx.quadraticCurveTo((x+w)*S, (y+h)*S, (x+w-r[3])*S, (y+h)*S);
+  ctx.lineTo((x+r[2])*S, (y+h)*S);
+  ctx.quadraticCurveTo(x*S, (y+h)*S, x*S, (y+h-r[2])*S);
+  ctx.lineTo(x*S, (y+r[0])*S);
+  ctx.quadraticCurveTo(x*S, y*S, (x+r[0])*S, y*S);
+  ctx.closePath();
+  ctx.fill();
+
+  // Red stripe on cap
+  ctx.fillStyle = 'rgba(200,16,46,0.7)';
+  ctx.fillRect((x+6)*S, y*S, 5*S, h*S);
+  ctx.restore();
+}
+
+// ── Draw can ───────────────────────────────────────────────
+function drawCan(x, y, tilt) {
+  const cw = CAN_W, ch = CAN_H;
+  ctx.save();
+  ctx.translate((x + cw/2)*S, (y + ch/2)*S);
+  ctx.rotate(tilt);
+
+  // Shadow
+  ctx.shadowColor = 'rgba(200,16,46,0.5)';
+  ctx.shadowBlur  = 14 * S;
+
+  // Body gradient
+  const g = ctx.createLinearGradient(-cw/2*S, 0, cw/2*S, 0);
+  g.addColorStop(0,    '#001840');
+  g.addColorStop(.25,  '#002776');
+  g.addColorStop(.5,   '#0046b4');
+  g.addColorStop(.72,  '#c8102e');
+  g.addColorStop(1,    '#6b0010');
+  ctx.fillStyle = g;
+  roundRect(-cw/2*S, -ch/2*S, cw*S, ch*S, 6*S);
+  ctx.fill();
+
+  ctx.shadowBlur = 0;
+
+  // Shine
+  const shine = ctx.createLinearGradient(-cw/2*S, 0, cw/2*S, 0);
+  shine.addColorStop(.1,  'rgba(255,255,255,0)');
+  shine.addColorStop(.35, 'rgba(255,255,255,0.18)');
+  shine.addColorStop(.5,  'rgba(255,255,255,0.04)');
+  shine.addColorStop(.9,  'rgba(255,255,255,0)');
+  ctx.fillStyle = shine;
+  roundRect(-cw/2*S, -ch/2*S, cw*S, ch*S, 6*S);
+  ctx.fill();
+
+  // Top cap
+  const topG = ctx.createLinearGradient(-cw/2*S, 0, cw/2*S, 0);
+  topG.addColorStop(0, '#555'); topG.addColorStop(.5, '#aaa'); topG.addColorStop(1, '#444');
+  ctx.fillStyle = topG;
+  ctx.beginPath();
+  ctx.ellipse(0, -ch/2*S, cw/2*S, 5*S, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  // Bottom cap
+  ctx.fillStyle = '#444';
+  ctx.beginPath();
+  ctx.ellipse(0, ch/2*S, cw/2*S, 5*S, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  // RED BULL text area
+  ctx.fillStyle = 'rgba(255,255,255,0.12)';
+  ctx.fillRect(-cw/2*S + 2*S, -8*S, cw*S - 4*S, 18*S);
+
+  // Mini "RB" text
+  ctx.fillStyle = 'rgba(255,255,255,0.85)';
+  ctx.font = `bold ${9*S}px 'Segoe UI', sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('RED', 0, -5*S);
+  ctx.fillText('BULL', 0, 5*S);
+
+  // Two tiny bull circles
+  ctx.fillStyle = 'rgba(255,255,255,0.25)';
+  ctx.beginPath(); ctx.arc(-5*S, 14*S, 4*S, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc( 5*S, 14*S, 4*S, 0, Math.PI*2); ctx.fill();
+
+  ctx.restore();
+}
+
+// ── Round rect helper ──────────────────────────────────────
+function roundRect(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.lineTo(x+w-r, y);      ctx.quadraticCurveTo(x+w, y,   x+w,   y+r);
+  ctx.lineTo(x+w,   y+h-r);  ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+  ctx.lineTo(x+r,   y+h);    ctx.quadraticCurveTo(x,   y+h, x,     y+h-r);
+  ctx.lineTo(x,     y+r);    ctx.quadraticCurveTo(x,   y,   x+r,   y);
+  ctx.closePath();
+}
+
+// ── Particles ─────────────────────────────────────────────
+function updateParticles() {
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x  += p.vx; p.y += p.vy; p.vy += 0.15;
+    p.life -= p.decay;
+    if (p.life <= 0) { particles.splice(i, 1); continue; }
+    ctx.globalAlpha = p.life;
+    ctx.beginPath();
+    ctx.arc(p.x*S, p.y*S, p.r*S, 0, Math.PI*2);
+    ctx.fillStyle = p.color;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+}
+
+// ── Collision check ────────────────────────────────────────
+function checkCollision() {
+  const cx = CAN_X + 4, cy = canY + 4;
+  const cw = CAN_W - 8, ch = CAN_H - 8;
+
+  // Ground / ceiling
+  if (canY + CAN_H > H - 40 || canY < -10) return true;
+
+  for (const p of pipes) {
+    const bY = p.topH + PIPE_GAP;
+    if (cx + cw > p.x + 4 && cx < p.x + PIPE_W - 4) {
+      if (cy < p.topH || cy + ch > bY) return true;
+    }
+  }
+  return false;
+}
+
+// ── Score overlay ──────────────────────────────────────────
+function drawScore() {
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.font = `bold ${36*S}px 'Segoe UI', sans-serif`;
+  ctx.fillStyle = 'rgba(255,255,255,0.95)';
+  ctx.shadowColor = 'rgba(200,16,46,0.8)';
+  ctx.shadowBlur = 16*S;
+  ctx.fillText(score, W/2*S, 80*S);
+  ctx.shadowBlur = 0;
+  ctx.restore();
+}
+
+// ── Idle screen ────────────────────────────────────────────
+function drawIdle() {
+  drawBg();
+
+  // Floating can preview
+  const floatY = H/2 - CAN_H/2 - 8 + Math.sin(bgT * 2.5) * 6;
+  drawCan(CAN_X * 2, floatY, Math.sin(bgT * 1.2) * .08);
+
+  // Title
+  ctx.save();
+  ctx.textAlign = 'center';
+
+  ctx.font = `900 ${46*S}px 'Segoe UI Black', 'Segoe UI', sans-serif`;
+  ctx.fillStyle = '#c8102e';
+  ctx.shadowColor = 'rgba(200,16,46,0.6)';
+  ctx.shadowBlur = 20*S;
+  ctx.fillText('FLAPPY', W/2*S, H/2*S - 60*S);
+  ctx.fillStyle = '#fff';
+  ctx.shadowColor = 'rgba(255,255,255,0.3)';
+  ctx.fillText('BULL', W/2*S, H/2*S - 10*S);
+  ctx.shadowBlur = 0;
+
+  // Tap prompt — pulse
+  const alpha = .5 + .5 * Math.sin(bgT * 3);
+  ctx.font = `${14*S}px 'Segoe UI', sans-serif`;
+  ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+  ctx.letterSpacing = '0.15em';
+  ctx.fillText('TAP  /  CLICK  /  SPACE  TO  START', W/2*S, H/2*S + 60*S);
+
+  if (best > 0) {
+    ctx.font = `${12*S}px 'Segoe UI', sans-serif`;
+    ctx.fillStyle = 'rgba(200,16,46,0.8)';
+    ctx.fillText(`BEST: ${best}`, W/2*S, H/2*S + 90*S);
+  }
+
+  ctx.restore();
+}
+
+// ── Game Over screen ───────────────────────────────────────
+function drawGameOver() {
+  // Semi-dark overlay
+  ctx.fillStyle = 'rgba(6,7,13,0.55)';
+  ctx.fillRect(0, 0, W*S, H*S);
+
+  ctx.save();
+  ctx.textAlign = 'center';
+
+  // Panel
+  const pw = 240, ph = 160;
+  const px = W/2 - pw/2, py = H/2 - ph/2;
+  const pg = ctx.createLinearGradient(px*S, py*S, px*S, (py+ph)*S);
+  pg.addColorStop(0, 'rgba(20,5,8,0.95)');
+  pg.addColorStop(1, 'rgba(10,3,5,0.95)');
+  ctx.fillStyle = pg;
+  roundRect(px*S, py*S, pw*S, ph*S, 12*S);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(200,16,46,0.6)';
+  ctx.lineWidth = 1.5*S;
+  roundRect(px*S, py*S, pw*S, ph*S, 12*S);
+  ctx.stroke();
+
+  ctx.font = `900 ${26*S}px 'Segoe UI Black', 'Segoe UI', sans-serif`;
+  ctx.fillStyle = '#c8102e';
+  ctx.shadowColor = 'rgba(200,16,46,0.6)'; ctx.shadowBlur = 12*S;
+  ctx.fillText('GAME OVER', W/2*S, (py+38)*S);
+  ctx.shadowBlur = 0;
+
+  ctx.font = `bold ${14*S}px 'Segoe UI', sans-serif`;
+  ctx.fillStyle = '#fff';
+  ctx.fillText(`Score: ${score}`, W/2*S, (py+72)*S);
+
+  if (score === best && score > 0) {
+    ctx.font = `${11*S}px 'Segoe UI', sans-serif`;
+    ctx.fillStyle = '#d4af37';
+    ctx.fillText('✦  NEW BEST!  ✦', W/2*S, (py+94)*S);
+  } else if (best > 0) {
+    ctx.font = `${11*S}px 'Segoe UI', sans-serif`;
+    ctx.fillStyle = 'rgba(200,16,46,0.7)';
+    ctx.fillText(`Best: ${best}`, W/2*S, (py+94)*S);
+  }
+
+  const tapAlpha = .55 + .45 * Math.sin(bgT * 4);
+  ctx.font = `${12*S}px 'Segoe UI', sans-serif`;
+  ctx.fillStyle = `rgba(255,255,255,${tapAlpha})`;
+  ctx.fillText('TAP TO PLAY AGAIN', W/2*S, (py+130)*S);
+
+  ctx.restore();
+}
+
+// ── Main loop ──────────────────────────────────────────────
+let animId;
+function loop() {
+  bgT += .012;
+  animId = requestAnimationFrame(loop);
+
+  if (state === 'IDLE') { drawIdle(); return; }
+
+  // Physics
+  vy    += GRAV;
+  canY  += vy;
+  frame++;
+
+  // Spawn pipes
+  if (frame % PIPE_FREQ === 0) pipes.push(newPipe());
+
+  // Move pipes, check scoring
+  for (let i = pipes.length - 1; i >= 0; i--) {
+    pipes[i].x -= PIPE_SPEED;
+    if (!pipes[i].passed && pipes[i].x + PIPE_W < CAN_X) {
+      pipes[i].passed = true;
+      score++;
+      document.getElementById('hud-score').textContent = score;
+      sfxScore();
+      burst(CAN_X + CAN_W/2, canY + CAN_H/2, '#d4af37', 10);
+    }
+    if (pipes[i].x + PIPE_W < -20) pipes.splice(i, 1);
+  }
+
+  // Collision
+  if (checkCollision() && state === 'PLAY') {
+    state = 'DEAD';
+    sfxDie();
+    burst(CAN_X + CAN_W/2, canY + CAN_H/2, '#c8102e', 30);
+    burst(CAN_X + CAN_W/2, canY + CAN_H/2, '#fff', 12);
+    flashTimer = 8;
+    if (score > best) {
+      best = score;
+      localStorage.setItem('flappybull_best', best);
+      document.getElementById('hud-best').textContent = best;
+    }
+  }
+
+  // Draw
+  if (flashTimer > 0) {
+    ctx.fillStyle = `rgba(255,255,255,${flashTimer/8 * 0.4})`;
+    ctx.fillRect(0,0,W*S,H*S);
+    flashTimer--;
+  }
+
+  drawBg();
+
+  // Pipes
+  pipes.forEach(p => drawPipe(p));
+
+  // Tilt angle
+  const tilt = Math.min(Math.max(vy * .04, -.4), .55);
+  drawCan(CAN_X, canY, tilt);
+
+  // Particles
+  updateParticles();
+
+  // Score display during play
+  if (state === 'PLAY') drawScore();
+  if (state === 'DEAD') drawGameOver();
+}
+
+// ── Input ──────────────────────────────────────────────────
+function onAction() {
+  AC.resume();
+  if (state === 'IDLE') {
+    init();
+    state = 'PLAY';
+    sfxFlap();
+    vy = JUMP_VEL;
+    return;
+  }
+  if (state === 'PLAY') {
+    vy = JUMP_VEL;
+    sfxFlap();
+    burst(CAN_X + CAN_W/2, canY + CAN_H/2, 'rgba(200,16,46,0.6)', 6);
+    return;
+  }
+  if (state === 'DEAD') {
+    init();
+    state = 'IDLE';
+    document.getElementById('hud-score').textContent = 0;
+    document.getElementById('hud-best').textContent  = best;
+    return;
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.code === 'Space' || e.code === 'ArrowUp') { e.preventDefault(); onAction(); }
+});
+canvas.addEventListener('pointerdown', e => { e.preventDefault(); onAction(); });
+document.addEventListener('touchstart', e => { e.preventDefault(); onAction(); }, { passive: false });
+
+// ── Start ──────────────────────────────────────────────────
+document.getElementById('hud-best').textContent = best;
+loop();
+</script>
+</body>
+</html>
