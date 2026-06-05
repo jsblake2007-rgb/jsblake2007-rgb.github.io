@@ -1,0 +1,1675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Red Bull — The Complete Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+/* ── RESET & BASE ──────────────────────────────────────── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --red:        #c8102e;
+  --red-dark:   #8b0010;
+  --red-glow:   rgba(200,16,46,0.35);
+  --blue:       #002776;
+  --blue-mid:   #0046b4;
+  --blue-light: #3a7bd5;
+  --silver:     #c0c8d8;
+  --gold:       #d4af37;
+  --night:      #06070d;
+  --deep:       #0c0e18;
+  --card:       rgba(255,255,255,0.04);
+  --border:     rgba(255,255,255,0.08);
+  --text:       #e8eaf0;
+  --muted:      #7a8299;
+  --faint:      #2e3348;
+  --trans:      cubic-bezier(0.25,0.46,0.45,0.94);
+}
+
+html { scroll-behavior: smooth; font-size: 16px; }
+
+body {
+  background: var(--night);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  line-height: 1.65;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ── CURSOR ─────────────────────────────────────────────── */
+#cursor {
+  position: fixed; top: 0; left: 0;
+  width: 10px; height: 10px;
+  background: var(--red);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%,-50%);
+  transition: width .2s, height .2s, background .2s;
+  mix-blend-mode: screen;
+}
+#cursor-ring {
+  position: fixed; top: 0; left: 0;
+  width: 32px; height: 32px;
+  border: 1px solid rgba(200,16,46,0.5);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%,-50%);
+  transition: all .12s var(--trans);
+}
+@media (max-width: 768px) {
+  body { cursor: auto; }
+  #cursor, #cursor-ring { display: none; }
+}
+
+/* ── CANVAS ─────────────────────────────────────────────── */
+#bg-canvas {
+  position: fixed; inset: 0;
+  width: 100%; height: 100%;
+  z-index: 0; pointer-events: none;
+}
+
+/* ── NAV ────────────────────────────────────────────────── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 1rem 2.5rem;
+  display: flex; justify-content: space-between; align-items: center;
+  transition: background .4s, backdrop-filter .4s;
+}
+nav.scrolled {
+  background: rgba(6,7,13,0.9);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-brand {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.6rem;
+  letter-spacing: .1em;
+  text-decoration: none;
+  display: flex; align-items: center; gap: .5rem;
+}
+.nav-brand .bull { color: var(--red); }
+.nav-brand .energy { color: var(--silver); }
+.nav-links { display: flex; gap: 2rem; list-style: none; }
+.nav-links a {
+  color: var(--muted); text-decoration: none;
+  font-size: .8rem; letter-spacing: .1em; text-transform: uppercase;
+  transition: color .3s; position: relative;
+}
+.nav-links a::after {
+  content: ''; position: absolute; bottom: -4px; left: 0;
+  width: 0; height: 1px; background: var(--red);
+  transition: width .3s var(--trans);
+}
+.nav-links a:hover { color: var(--text); }
+.nav-links a:hover::after { width: 100%; }
+@media (max-width: 768px) { .nav-links { display: none; } }
+
+/* ── MAIN WRAPPER ────────────────────────────────────────── */
+main { position: relative; z-index: 2; }
+
+/* ── SECTION SHARED ─────────────────────────────────────── */
+.section {
+  padding: 7rem 2.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: .72rem; color: var(--red);
+  letter-spacing: .22em; text-transform: uppercase;
+  margin-bottom: .75rem;
+  display: flex; align-items: center; gap: .75rem;
+}
+.section-label::before {
+  content: ''; width: 24px; height: 1px; background: var(--red);
+}
+.section-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  line-height: 1.05;
+  letter-spacing: .04em;
+  color: #fff;
+  margin-bottom: 1rem;
+}
+.section-title span { color: var(--red); }
+
+/* ── REVEAL ─────────────────────────────────────────────── */
+.reveal {
+  opacity: 0; transform: translateY(28px);
+  transition: opacity .8s var(--trans), transform .8s var(--trans);
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-d1 { transition-delay: .1s; }
+.reveal-d2 { transition-delay: .22s; }
+.reveal-d3 { transition-delay: .36s; }
+.reveal-d4 { transition-delay: .5s; }
+
+/* ══════════════════════════════════════════════════════════
+   HERO
+══════════════════════════════════════════════════════════ */
+#hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  justify-content: center;
+  padding: 9rem 2.5rem 5rem;
+  position: relative; overflow: hidden;
+}
+
+.hero-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: .72rem; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 1.5rem;
+  opacity: 0; transform: translateY(16px);
+  animation: fadeUp .7s .2s var(--trans) forwards;
+}
+
+.hero-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(4rem, 14vw, 10rem);
+  line-height: .95;
+  letter-spacing: .04em;
+  margin-bottom: 1.5rem;
+  opacity: 0; transform: translateY(24px);
+  animation: fadeUp .8s .4s var(--trans) forwards;
+}
+.hero-title .red { color: var(--red); }
+.hero-title .white { color: #fff; }
+.hero-title .gray { color: var(--muted); }
+
+.hero-sub {
+  font-size: 1.1rem; color: var(--muted);
+  max-width: 540px; margin-bottom: 2.5rem;
+  opacity: 0; transform: translateY(16px);
+  animation: fadeUp .8s .65s var(--trans) forwards;
+}
+
+.hero-stats {
+  display: flex; gap: 2.5rem; flex-wrap: wrap;
+  opacity: 0; transform: translateY(16px);
+  animation: fadeUp .8s .85s var(--trans) forwards;
+}
+.hero-stat { display: flex; flex-direction: column; }
+.hero-stat .num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.8rem; line-height: 1; color: var(--red);
+  letter-spacing: .04em;
+}
+.hero-stat .lbl {
+  font-size: .72rem; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--muted); margin-top: .2rem;
+}
+
+.hero-scroll {
+  position: absolute; bottom: 2.5rem; left: 50%;
+  transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: .4rem;
+  opacity: 0; animation: fadeIn 1s 1.6s forwards;
+}
+.hero-scroll span {
+  font-family: 'DM Mono', monospace;
+  font-size: .6rem; letter-spacing: .15em; text-transform: uppercase;
+  color: var(--faint);
+}
+.scroll-bar {
+  width: 1px; height: 44px;
+  background: linear-gradient(to bottom, var(--red), transparent);
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+
+/* ── CAN VISUAL ─────────────────────────────────────────── */
+.hero-can {
+  position: absolute; right: 8%; top: 50%;
+  transform: translateY(-50%);
+  width: clamp(180px, 20vw, 280px);
+  opacity: 0; animation: canFloat 1s .6s var(--trans) forwards;
+  filter: drop-shadow(0 0 40px rgba(200,16,46,0.4));
+}
+@keyframes canFloat {
+  from { opacity: 0; transform: translateY(-40%); }
+  to   { opacity: 1; transform: translateY(-50%); }
+}
+.hero-can svg { width: 100%; height: auto; animation: gentleFloat 4s ease-in-out infinite; }
+@keyframes gentleFloat {
+  0%,100% { transform: translateY(0) rotate(-4deg); }
+  50%      { transform: translateY(-14px) rotate(-4deg); }
+}
+@media (max-width: 900px) { .hero-can { display: none; } }
+
+/* ══════════════════════════════════════════════════════════
+   WHAT IS RED BULL
+══════════════════════════════════════════════════════════ */
+#what {
+  background: linear-gradient(180deg, transparent, rgba(200,16,46,0.04) 40%, transparent);
+}
+.what-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 4rem; align-items: center;
+}
+.what-text p { color: var(--muted); margin-bottom: 1.1rem; }
+.what-text p strong { color: var(--text); font-weight: 500; }
+.what-badges { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1.5rem; }
+.badge {
+  font-family: 'DM Mono', monospace;
+  font-size: .65rem; letter-spacing: .1em; text-transform: uppercase;
+  padding: .3rem .8rem; border-radius: 2px;
+  background: rgba(200,16,46,0.12);
+  border: 1px solid rgba(200,16,46,0.3);
+  color: var(--red);
+}
+
+.fact-cards {
+  display: flex; flex-direction: column; gap: 1rem;
+}
+.fact-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  display: flex; gap: 1.25rem; align-items: flex-start;
+  transition: border-color .35s, transform .35s;
+}
+.fact-card:hover {
+  border-color: rgba(200,16,46,0.35);
+  transform: translateX(6px);
+}
+.fact-icon {
+  font-size: 1.6rem; flex-shrink: 0;
+  width: 42px; height: 42px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(200,16,46,0.12); border-radius: 6px;
+}
+.fact-card h4 { font-size: .88rem; font-weight: 600; color: var(--text); margin-bottom: .25rem; }
+.fact-card p  { font-size: .82rem; color: var(--muted); }
+
+@media (max-width: 768px) { .what-grid { grid-template-columns: 1fr; gap: 2.5rem; } }
+
+/* ══════════════════════════════════════════════════════════
+   INGREDIENTS
+══════════════════════════════════════════════════════════ */
+#ingredients { background: rgba(0,39,118,0.05); }
+
+.ingredients-intro {
+  display: grid; grid-template-columns: 1fr 1.4fr;
+  gap: 4rem; align-items: start; margin-bottom: 4rem;
+}
+.ingredients-intro p { color: var(--muted); }
+@media (max-width: 768px) { .ingredients-intro { grid-template-columns: 1fr; gap: 2rem; } }
+
+.ingr-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.25rem;
+}
+.ingr-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem;
+  transition: all .35s var(--trans);
+  position: relative; overflow: hidden;
+}
+.ingr-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--red), var(--blue-mid));
+  transform: scaleX(0); transform-origin: left;
+  transition: transform .4s var(--trans);
+}
+.ingr-card:hover { border-color: rgba(200,16,46,0.3); transform: translateY(-4px); }
+.ingr-card:hover::before { transform: scaleX(1); }
+.ingr-amount {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2rem; letter-spacing: .04em; color: var(--red);
+  line-height: 1;
+}
+.ingr-unit { font-size: .75rem; color: var(--muted); margin-bottom: .6rem; }
+.ingr-name { font-weight: 600; font-size: .9rem; color: var(--text); margin-bottom: .5rem; }
+.ingr-desc { font-size: .78rem; color: var(--muted); line-height: 1.55; }
+.ingr-badge {
+  margin-top: .75rem;
+  font-family: 'DM Mono', monospace;
+  font-size: .6rem; letter-spacing: .1em; text-transform: uppercase;
+  padding: .2rem .6rem; border-radius: 2px;
+  display: inline-block;
+}
+.ingr-badge.stimulant { background: rgba(200,16,46,0.15); color: var(--red); border: 1px solid rgba(200,16,46,0.3); }
+.ingr-badge.amino     { background: rgba(0,70,180,0.15); color: #6fa3e8; border: 1px solid rgba(0,70,180,0.3); }
+.ingr-badge.vitamin   { background: rgba(212,175,55,0.12); color: var(--gold); border: 1px solid rgba(212,175,55,0.3); }
+.ingr-badge.energy    { background: rgba(60,200,100,0.1); color: #5cc88a; border: 1px solid rgba(60,200,100,0.3); }
+.ingr-badge.mineral   { background: rgba(180,180,180,0.1); color: var(--silver); border: 1px solid rgba(180,180,180,0.2); }
+
+/* ══════════════════════════════════════════════════════════
+   BODY EFFECTS TIMELINE
+══════════════════════════════════════════════════════════ */
+#timeline {
+  background: linear-gradient(180deg, transparent, rgba(200,16,46,0.05) 50%, transparent);
+}
+
+.timeline-wrap { position: relative; margin-top: 3rem; }
+.timeline-line {
+  position: absolute; left: 50%; top: 0; bottom: 0;
+  width: 1px; background: linear-gradient(to bottom, var(--red), rgba(200,16,46,0.1));
+  transform: translateX(-50%);
+}
+@media (max-width: 768px) { .timeline-line { left: 28px; } }
+
+.tl-items { display: flex; flex-direction: column; gap: 3rem; }
+
+.tl-item {
+  display: grid; grid-template-columns: 1fr 60px 1fr;
+  align-items: center; gap: 1.5rem;
+}
+.tl-item.right .tl-left  { order: 3; }
+.tl-item.right .tl-mid   { order: 2; }
+.tl-item.right .tl-right { order: 1; }
+
+.tl-left, .tl-right { }
+.tl-item.left  .tl-right { visibility: hidden; }
+.tl-item.right .tl-left  { visibility: hidden; }
+
+.tl-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem;
+  transition: all .35s var(--trans);
+}
+.tl-card:hover { border-color: rgba(200,16,46,0.4); transform: scale(1.02); }
+.tl-time {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.5rem; letter-spacing: .06em; color: var(--red);
+  margin-bottom: .4rem;
+}
+.tl-card h4 { font-size: .95rem; font-weight: 600; color: var(--text); margin-bottom: .5rem; }
+.tl-card p  { font-size: .82rem; color: var(--muted); }
+.tl-card ul { padding-left: 1rem; margin-top: .5rem; }
+.tl-card ul li { font-size: .8rem; color: var(--muted); margin-bottom: .3rem; }
+
+.tl-dot {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: var(--red);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+  box-shadow: 0 0 20px rgba(200,16,46,0.5);
+  flex-shrink: 0; margin: 0 auto;
+  z-index: 1; position: relative;
+}
+
+@media (max-width: 768px) {
+  .timeline-line { left: 28px; }
+  .tl-item { grid-template-columns: 56px 1fr; gap: 1rem; }
+  .tl-item.right .tl-left  { display: none; }
+  .tl-item.left  .tl-right { display: none; }
+  .tl-item.right .tl-right { order: 3; visibility: visible; }
+  .tl-item.right .tl-mid   { order: 1; }
+  .tl-item.left  .tl-mid   { grid-column: 1; }
+  .tl-item.left  .tl-left  { grid-column: 2; visibility: visible; }
+  .tl-dot { width: 36px; height: 36px; font-size: .9rem; }
+}
+
+/* ══════════════════════════════════════════════════════════
+   EFFECTS ON BODY (SYSTEMS)
+══════════════════════════════════════════════════════════ */
+#effects { }
+
+.effects-intro { max-width: 620px; margin-bottom: 3.5rem; }
+.effects-intro p { color: var(--muted); }
+
+.body-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.body-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.75rem;
+  transition: all .4s var(--trans);
+  position: relative;
+}
+.body-card::after {
+  content: '';
+  position: absolute; inset: 0; border-radius: 12px;
+  box-shadow: 0 0 30px rgba(200,16,46,0);
+  transition: box-shadow .4s;
+}
+.body-card:hover { border-color: rgba(200,16,46,0.3); transform: translateY(-5px); }
+.body-card:hover::after { box-shadow: 0 8px 30px rgba(200,16,46,0.1); }
+
+.body-icon {
+  font-size: 2rem; margin-bottom: 1rem;
+  width: 52px; height: 52px;
+  background: rgba(200,16,46,0.1);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+}
+.body-card h3 { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: .75rem; }
+.body-card p  { font-size: .82rem; color: var(--muted); margin-bottom: .75rem; }
+
+.effect-list { list-style: none; }
+.effect-list li {
+  font-size: .8rem; color: var(--muted);
+  padding: .3rem 0; border-bottom: 1px solid var(--border);
+  display: flex; align-items: flex-start; gap: .5rem;
+}
+.effect-list li:last-child { border-bottom: none; }
+.effect-list li.pos::before { content: '+'; color: #5cc88a; font-weight: 700; flex-shrink: 0; }
+.effect-list li.neg::before { content: '−'; color: var(--red);   font-weight: 700; flex-shrink: 0; }
+.effect-list li.neu::before { content: '·'; color: var(--muted); font-weight: 700; flex-shrink: 0; }
+
+/* ══════════════════════════════════════════════════════════
+   NUTRITION COMPARISON BAR CHART
+══════════════════════════════════════════════════════════ */
+#nutrition { background: rgba(0,39,118,0.04); }
+
+.nutrition-panel {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+}
+@media (max-width: 768px) { .nutrition-panel { grid-template-columns: 1fr; gap: 2.5rem; } }
+
+.nutrition-table {
+  display: flex; flex-direction: column; gap: .75rem;
+}
+.nut-row {
+  display: flex; flex-direction: column; gap: .3rem;
+}
+.nut-label {
+  display: flex; justify-content: space-between;
+  font-size: .82rem;
+}
+.nut-label .name { color: var(--text); font-weight: 500; }
+.nut-label .val  { color: var(--muted); font-family: 'DM Mono', monospace; font-size: .76rem; }
+.nut-bar-bg {
+  height: 4px; background: var(--faint); border-radius: 4px; overflow: hidden;
+}
+.nut-bar-fill {
+  height: 100%; border-radius: 4px;
+  background: linear-gradient(90deg, var(--red), var(--blue-mid));
+  width: 0; transition: width 1.4s var(--trans);
+}
+
+.caffeine-compare { display: flex; flex-direction: column; gap: 1rem; }
+.caffeine-compare h4 {
+  font-size: .88rem; font-weight: 600; color: var(--text); margin-bottom: .5rem;
+}
+.cc-row { display: flex; flex-direction: column; gap: .3rem; }
+.cc-label {
+  display: flex; justify-content: space-between;
+  font-size: .8rem; color: var(--muted);
+}
+.cc-bar-bg { height: 6px; background: var(--faint); border-radius: 4px; overflow: hidden; }
+.cc-bar-fill {
+  height: 100%; border-radius: 4px;
+  width: 0; transition: width 1.4s var(--trans);
+}
+.cc-bar-fill.redbull { background: var(--red); }
+.cc-bar-fill.coffee  { background: #7b4f2e; }
+.cc-bar-fill.tea     { background: #5c7a3e; }
+.cc-bar-fill.cola    { background: #4a2e0a; }
+.cc-bar-fill.monster { background: #6bba27; }
+.cc-bar-fill.espresso{ background: #3d2010; }
+
+/* ══════════════════════════════════════════════════════════
+   HISTORY
+══════════════════════════════════════════════════════════ */
+#history { }
+
+.history-timeline {
+  display: flex; flex-direction: column; gap: 0;
+  margin-top: 3rem; border-left: 1px solid var(--border); padding-left: 2rem;
+}
+.hist-event {
+  position: relative; padding: 0 0 2.5rem 0;
+  transition: transform .3s;
+}
+.hist-event:last-child { padding-bottom: 0; }
+.hist-event::before {
+  content: '';
+  position: absolute; left: -2.4rem; top: .35rem;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--red);
+  box-shadow: 0 0 10px rgba(200,16,46,0.6);
+}
+.hist-year {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.5rem; letter-spacing: .06em; color: var(--red);
+}
+.hist-event h4 { font-size: .95rem; font-weight: 600; color: var(--text); margin-bottom: .35rem; }
+.hist-event p  { font-size: .82rem; color: var(--muted); max-width: 560px; }
+
+/* ══════════════════════════════════════════════════════════
+   WARNINGS
+══════════════════════════════════════════════════════════ */
+#warnings { background: rgba(200,16,46,0.04); }
+
+.warn-banner {
+  background: rgba(200,16,46,0.1);
+  border: 1px solid rgba(200,16,46,0.3);
+  border-radius: 10px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 3rem;
+  display: flex; gap: 1rem; align-items: flex-start;
+}
+.warn-banner .icon { font-size: 1.5rem; flex-shrink: 0; margin-top: .1rem; }
+.warn-banner p { color: var(--muted); font-size: .88rem; }
+.warn-banner p strong { color: var(--text); }
+
+.warn-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.25rem;
+}
+.warn-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem;
+  transition: border-color .3s, transform .3s;
+}
+.warn-card:hover { border-color: rgba(200,16,46,0.35); transform: translateY(-3px); }
+.warn-card .wi { font-size: 1.6rem; margin-bottom: .75rem; }
+.warn-card h4 { font-size: .88rem; font-weight: 600; color: var(--text); margin-bottom: .5rem; }
+.warn-card p  { font-size: .78rem; color: var(--muted); line-height: 1.55; }
+
+.dosage-note {
+  margin-top: 3rem;
+  background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+  padding: 2rem;
+}
+.dosage-note h3 { font-size: 1.1rem; font-weight: 600; color: var(--text); margin-bottom: 1rem; }
+.dosage-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+}
+.dosage-item { display: flex; flex-direction: column; }
+.dosage-item .val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2rem; color: var(--red); letter-spacing: .04em; line-height: 1;
+}
+.dosage-item .key { font-size: .72rem; color: var(--muted); letter-spacing: .05em; text-transform: uppercase; margin-top: .15rem; }
+
+/* ══════════════════════════════════════════════════════════
+   SCIENCE
+══════════════════════════════════════════════════════════ */
+#science { background: rgba(0,39,118,0.04); }
+
+.science-cards {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem; margin-top: 1rem;
+}
+.sci-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 1.75rem;
+  transition: all .35s var(--trans);
+}
+.sci-card:hover { border-color: rgba(0,70,180,0.4); transform: translateY(-4px); }
+.sci-card h3 { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: .75rem; }
+.sci-card p  { font-size: .82rem; color: var(--muted); }
+.sci-card .sci-label {
+  font-family: 'DM Mono', monospace;
+  font-size: .6rem; letter-spacing: .12em; text-transform: uppercase;
+  padding: .2rem .7rem; border-radius: 2px;
+  background: rgba(0,70,180,0.12); color: var(--blue-light);
+  border: 1px solid rgba(0,70,180,0.3);
+  display: inline-block; margin-bottom: .75rem;
+}
+
+/* ══════════════════════════════════════════════════════════
+   FOOTER
+══════════════════════════════════════════════════════════ */
+footer {
+  position: relative; z-index: 2;
+  border-top: 1px solid var(--border);
+  padding: 2rem 2.5rem;
+  display: flex; justify-content: space-between; align-items: center;
+  color: var(--faint); font-size: .75rem;
+  font-family: 'DM Mono', monospace; letter-spacing: .05em;
+  flex-wrap: wrap; gap: 1rem;
+}
+footer a { color: var(--muted); text-decoration: none; transition: color .3s; }
+footer a:hover { color: var(--red); }
+
+/* ══════════════════════════════════════════════════════════
+   KEYFRAMES
+══════════════════════════════════════════════════════════ */
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+@keyframes scrollPulse {
+  0%,100% { opacity: .3; transform: scaleY(.5); transform-origin: top; }
+  50%      { opacity: 1; transform: scaleY(1); transform-origin: top; }
+}
+
+/* ── misc ─── */
+.divider {
+  width: 100%; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  position: relative; z-index: 2;
+}
+</style>
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- Canvas background -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- ── NAV ──────────────────────────────────────────────── -->
+<nav id="navbar">
+  <a href="#hero" class="nav-brand">
+    <span class="bull">RED</span><span class="energy">BULL</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#what">Overview</a></li>
+    <li><a href="#ingredients">Ingredients</a></li>
+    <li><a href="#timeline">Timeline</a></li>
+    <li><a href="#effects">Body Effects</a></li>
+    <li><a href="#history">History</a></li>
+    <li><a href="#warnings">Safety</a></li>
+  </ul>
+</nav>
+
+<main>
+
+<!-- ══════════════════════════════════════════════════════
+     HERO
+══════════════════════════════════════════════════════ -->
+<section id="hero">
+  <p class="hero-tag">// the complete guide</p>
+  <h1 class="hero-title">
+    <span class="red">RED</span><br />
+    <span class="white">BULL</span><br />
+    <span class="gray">DECODED</span>
+  </h1>
+  <p class="hero-sub">
+    Everything you need to know about the world's most popular energy drink —
+    from what's inside the can to what happens inside your body.
+  </p>
+  <div class="hero-stats">
+    <div class="hero-stat"><span class="num">12.5B+</span><span class="lbl">Cans sold yearly</span></div>
+    <div class="hero-stat"><span class="num">175+</span><span class="lbl">Countries available</span></div>
+    <div class="hero-stat"><span class="num">80mg</span><span class="lbl">Caffeine per 250ml</span></div>
+    <div class="hero-stat"><span class="num">1987</span><span class="lbl">Year founded</span></div>
+  </div>
+
+  <!-- Illustrated can -->
+  <div class="hero-can" aria-hidden="true">
+    <svg viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="canGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%"   stop-color="#1a1a2e"/>
+          <stop offset="30%"  stop-color="#002776"/>
+          <stop offset="55%"  stop-color="#0046b4"/>
+          <stop offset="75%"  stop-color="#c8102e"/>
+          <stop offset="100%" stop-color="#8b0010"/>
+        </linearGradient>
+        <linearGradient id="topGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#888"/>
+          <stop offset="100%" stop-color="#444"/>
+        </linearGradient>
+        <linearGradient id="shine" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%"   stop-color="rgba(255,255,255,0)"/>
+          <stop offset="40%"  stop-color="rgba(255,255,255,0.12)"/>
+          <stop offset="55%"  stop-color="rgba(255,255,255,0.06)"/>
+          <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+        </linearGradient>
+      </defs>
+      <!-- Can body -->
+      <rect x="20" y="40" width="160" height="310" rx="18" fill="url(#canGrad)"/>
+      <!-- Shine -->
+      <rect x="20" y="40" width="160" height="310" rx="18" fill="url(#shine)"/>
+      <!-- Top cap -->
+      <ellipse cx="100" cy="40" rx="80" ry="14" fill="url(#topGrad)"/>
+      <!-- Tab ring -->
+      <ellipse cx="100" cy="28" rx="30" ry="8" fill="#666"/>
+      <ellipse cx="100" cy="28" rx="22" ry="5" fill="#888"/>
+      <!-- Branding text area white strip -->
+      <rect x="30" y="130" width="140" height="60" rx="4" fill="rgba(255,255,255,0.08)"/>
+      <!-- Bulls symbol suggestion -->
+      <text x="100" y="100" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="28" fill="white" opacity=".9">RED</text>
+      <text x="100" y="133" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="28" fill="white" opacity=".9">BULL</text>
+      <!-- two bull shapes (circles representing them) -->
+      <circle cx="72" cy="175" r="20" fill="rgba(255,255,255,0.15)"/>
+      <circle cx="128" cy="175" r="20" fill="rgba(255,255,255,0.15)"/>
+      <text x="72" y="180" text-anchor="middle" font-size="20">🐂</text>
+      <text x="128" y="180" text-anchor="middle" font-size="20">🐂</text>
+      <!-- Energy text -->
+      <text x="100" y="225" text-anchor="middle" font-family="sans-serif" font-size="11" fill="rgba(255,255,255,0.6)" letter-spacing="2">ENERGY DRINK</text>
+      <!-- Volume -->
+      <text x="100" y="340" text-anchor="middle" font-family="sans-serif" font-size="11" fill="rgba(255,255,255,0.4)">250 ml / 8.4 fl oz</text>
+    </svg>
+  </div>
+
+  <div class="hero-scroll">
+    <div class="scroll-bar"></div>
+    <span>scroll</span>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════════════════════════
+     WHAT IS RED BULL
+══════════════════════════════════════════════════════ -->
+<section id="what">
+  <div class="section">
+    <div class="what-grid reveal">
+      <div class="what-text">
+        <p class="section-label">Overview</p>
+        <h2 class="section-title">What is<br /><span>Red Bull?</span></h2>
+        <p>Red Bull is an <strong>Austrian energy drink</strong> created by Dietrich Mateschitz, inspired by the Thai functional drink <em>Krating Daeng</em>. It is the world's best-selling energy drink by both market share and volume.</p>
+        <p>A standard 250 ml (8.4 fl oz) can contains <strong>80 mg of caffeine</strong> — roughly the same as a cup of home-brewed coffee — alongside taurine, B-vitamins, sugars, and alpine spring water.</p>
+        <p>The tagline <em>"Red Bull Gives You Wings"</em> refers to its claimed ability to improve physical endurance, concentration, reaction time, and overall vitality.</p>
+        <div class="what-badges">
+          <span class="badge">Carbonated</span>
+          <span class="badge">Stimulant</span>
+          <span class="badge">250ml / 8.4oz</span>
+          <span class="badge">80mg Caffeine</span>
+          <span class="badge">Sugar-free option</span>
+        </div>
+      </div>
+      <div class="fact-cards reveal reveal-d1">
+        <div class="fact-card">
+          <div class="fact-icon">🌍</div>
+          <div>
+            <h4>Global No.1 Energy Drink</h4>
+            <p>Red Bull holds ~43% of the global energy drink market by volume, outselling Monster, Rockstar, and all others combined in many regions.</p>
+          </div>
+        </div>
+        <div class="fact-card">
+          <div class="fact-icon">🇦🇹</div>
+          <div>
+            <h4>Austrian Origin</h4>
+            <p>Dietrich Mateschitz discovered the Thai drink Krating Daeng in 1982, licensed the recipe, reformulated it for Western tastes, and launched it in Austria in 1987.</p>
+          </div>
+        </div>
+        <div class="fact-card">
+          <div class="fact-icon">⚗️</div>
+          <div>
+            <h4>Clinically Studied Formula</h4>
+            <p>Red Bull's formula has been studied in over 50 peer-reviewed clinical trials, with positive findings for cognitive performance and endurance when used appropriately.</p>
+          </div>
+        </div>
+        <div class="fact-card">
+          <div class="fact-icon">🏎️</div>
+          <div>
+            <h4>Massive Sports Sponsorship</h4>
+            <p>Red Bull owns two F1 teams, multiple football clubs, the Red Bull Air Race, and sponsors thousands of athletes worldwide — marketing is a defining pillar of the brand.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════════════════════════
+     INGREDIENTS
+══════════════════════════════════════════════════════ -->
+<section id="ingredients">
+  <div class="section">
+    <div class="reveal">
+      <p class="section-label">Inside the Can</p>
+      <h2 class="section-title">Every <span>Ingredient</span><br />Explained</h2>
+    </div>
+    <div class="ingredients-intro">
+      <div class="reveal reveal-d1">
+        <p>Red Bull's formula is precisely calibrated. Each 250 ml can contains a specific blend of active and carrier ingredients chosen for their synergistic effects on energy, focus, and endurance.</p>
+      </div>
+      <div class="reveal reveal-d2">
+        <p>Unlike many energy drinks, Red Bull publishes the exact amounts of its key functional ingredients rather than hiding them in a "proprietary blend." This transparency has made it the benchmark formulation in the industry.</p>
+      </div>
+    </div>
+
+    <div class="ingr-grid reveal reveal-d1">
+
+      <div class="ingr-card">
+        <div class="ingr-amount">80</div>
+        <div class="ingr-unit">mg per 250ml</div>
+        <div class="ingr-name">Caffeine</div>
+        <div class="ingr-desc">Adenosine receptor antagonist. Blocks the brain chemical that causes drowsiness, increasing alertness, reaction time, and perceived energy levels. Primary active compound.</div>
+        <span class="ingr-badge stimulant">Stimulant</span>
+      </div>
+
+      <div class="ingr-card">
+        <div class="ingr-amount">1000</div>
+        <div class="ingr-unit">mg per 250ml</div>
+        <div class="ingr-name">Taurine</div>
+        <div class="ingr-desc">A naturally occurring amino acid found in meat and fish. Acts as an antioxidant, supports neurological development, regulates calcium signalling, and may improve athletic performance.</div>
+        <span class="ingr-badge amino">Amino Acid</span>
+      </div>
+
+      <div class="ingr-card">
+        <div class="ingr-amount">27</div>
+        <div class="ingr-unit">g per 250ml (original)</div>
+        <div class="ingr-name">Sucrose &amp; Glucose</div>
+        <div class="ingr-desc">Fast-acting carbohydrates providing an immediate energy source for the brain and muscles. The glucose ratio means faster absorption compared to sucrose alone.</div>
+        <span class="ingr-badge energy">Energy Source</span>
+      </div>
+
+      <div class="ingr-card">
+        <div class="ingr-amount">600</div>
+        <div class="ingr-unit">mg per 250ml</div>
+        <div class="ingr-name">Niacin (Vitamin B3)</div>
+        <div class="ingr-desc">Essential for converting food into energy at the cellular level. Supports DNA repair, nervous system function, and cholesterol regulation. Part of the NAD+ pathway.</div>
+        <span class="ingr-badge vitamin">B Vitamin</span>
+      </div>
+
+      <div class="ingr-card">
+        <div class="ingr-amount">2.0</div>
+        <div class="ingr-unit">mg per 250ml</div>
+        <div class="ingr-name">Vitamin B6</div>
+        <div class="ingr-desc">Critical for protein metabolism, neurotransmitter synthesis (dopamine, serotonin), and red blood cell production. Supports mood regulation and cognitive function.</div>
+        <span class="ingr-badge vitamin">B Vitamin</span>
+      </div>
+
+      <div class="ingr-card">
+        <div class="ingr-amount">6.0</div>
+        <div class="ingr-unit">μg per 250ml</div>
+        <div class="ingr-name">Vitamin B12</div>
+        <div class="ingr-desc">Required for red blood cell formation, neurological function, and DNA synthesis. Deficiency causes fatigue — supplementation can restore energy levels in those who are deficient.</div>
+        <span class="ingr-badge vitamin">B Vitamin</span>
+      </div>
+
+      <div class="ingr-card">
+        <div class="ingr-amount">5.0</div>
+        <div class="ingr-unit">mg per 250ml</div>
+        <div class="ingr-name">Pantothenic Acid (B5)</div>
+        <div class="ingr-desc">Coenzyme A precursor. Essential for synthesising and metabolising proteins, carbohydrates, and fats. Plays a central role in the citric acid (Krebs) energy cycle.</div>
+        <span class="ingr-badge vitamin">B Vitamin</span>
+      </div>
+
+      <div class="ingr-card">
+        <div class="ingr-amount">Alpine</div>
+        <div class="ingr-unit">spring water base</div>
+        <div class="ingr-name">Alpine Spring Water</div>
+        <div class="ingr-desc">Red Bull uses Austrian Alpine spring water as its primary carrier. The mineral content of the water is part of the flavour profile and contributes trace electrolytes.</div>
+        <span class="ingr-badge mineral">Mineral Water</span>
+      </div>
+
+      <div class="ingr-card">
+        <div class="ingr-amount">CO₂</div>
+        <div class="ingr-unit">carbonated</div>
+        <div class="ingr-name">Carbonation &amp; Citric Acid</div>
+        <div class="ingr-desc">Carbonation improves palatability and slightly speeds gastric emptying. Citric acid acts as a preservative and flavour enhancer. Together they give Red Bull its distinctive sharp bite.</div>
+        <span class="ingr-badge mineral">Carrier</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════════════════════════
+     NUTRITION FACTS
+══════════════════════════════════════════════════════ -->
+<section id="nutrition">
+  <div class="section">
+    <div class="reveal">
+      <p class="section-label">Nutritional Data</p>
+      <h2 class="section-title">By the <span>Numbers</span></h2>
+    </div>
+    <div class="nutrition-panel">
+      <div class="nutrition-table reveal reveal-d1">
+        <h4 style="font-size:.88rem;font-weight:600;color:var(--text);margin-bottom:1rem;">Per 250ml Can (Original)</h4>
+
+        <div class="nut-row">
+          <div class="nut-label"><span class="name">Calories</span><span class="val">113 kcal</span></div>
+          <div class="nut-bar-bg"><div class="nut-bar-fill" data-w="57"></div></div>
+        </div>
+        <div class="nut-row">
+          <div class="nut-label"><span class="name">Total Carbohydrates</span><span class="val">28g</span></div>
+          <div class="nut-bar-bg"><div class="nut-bar-fill" data-w="9"></div></div>
+        </div>
+        <div class="nut-row">
+          <div class="nut-label"><span class="name">Sugars</span><span class="val">27g</span></div>
+          <div class="nut-bar-bg"><div class="nut-bar-fill" data-w="30"></div></div>
+        </div>
+        <div class="nut-row">
+          <div class="nut-label"><span class="name">Protein</span><span class="val">&lt;1g</span></div>
+          <div class="nut-bar-bg"><div class="nut-bar-fill" data-w="2"></div></div>
+        </div>
+        <div class="nut-row">
+          <div class="nut-label"><span class="name">Sodium</span><span class="val">105mg</span></div>
+          <div class="nut-bar-bg"><div class="nut-bar-fill" data-w="5"></div></div>
+        </div>
+        <div class="nut-row">
+          <div class="nut-label"><span class="name">Caffeine</span><span class="val">80mg</span></div>
+          <div class="nut-bar-bg"><div class="nut-bar-fill" data-w="80"></div></div>
+        </div>
+        <div class="nut-row">
+          <div class="nut-label"><span class="name">Taurine</span><span class="val">1000mg</span></div>
+          <div class="nut-bar-bg"><div class="nut-bar-fill" data-w="100"></div></div>
+        </div>
+        <div class="nut-row">
+          <div class="nut-label"><span class="name">Niacin (B3)</span><span class="val">22mg  (138% DV)</span></div>
+          <div class="nut-bar-bg"><div class="nut-bar-fill" data-w="100"></div></div>
+        </div>
+        <div class="nut-row">
+          <div class="nut-label"><span class="name">Vitamin B6</span><span class="val">5mg  (294% DV)</span></div>
+          <div class="nut-bar-bg"><div class="nut-bar-fill" data-w="100"></div></div>
+        </div>
+        <div class="nut-row">
+          <div class="nut-label"><span class="name">Vitamin B12</span><span class="val">5.1μg  (213% DV)</span></div>
+          <div class="nut-bar-bg"><div class="nut-bar-fill" data-w="100"></div></div>
+        </div>
+
+        <p style="font-size:.7rem;color:var(--muted);margin-top:1.25rem;">DV = Daily Value based on 2000 kcal/day diet. Sugar-free (Zero) variant contains 0g sugar, 0 kcal, uses aspartame &amp; acesulfame K.</p>
+      </div>
+
+      <div class="caffeine-compare reveal reveal-d2">
+        <h4>Caffeine Comparison</h4>
+        <p style="font-size:.78rem;color:var(--muted);margin-bottom:1.25rem;">How does one Red Bull (80mg) stack up against other caffeinated drinks?</p>
+
+        <div class="cc-row">
+          <div class="cc-label"><span>Red Bull 250ml</span><span>80mg</span></div>
+          <div class="cc-bar-bg"><div class="cc-bar-fill redbull" data-w="42"></div></div>
+        </div>
+        <div class="cc-row">
+          <div class="cc-label"><span>Drip Coffee 240ml</span><span>95–200mg</span></div>
+          <div class="cc-bar-bg"><div class="cc-bar-fill coffee" data-w="62"></div></div>
+        </div>
+        <div class="cc-row">
+          <div class="cc-label"><span>Espresso 30ml</span><span>63mg</span></div>
+          <div class="cc-bar-bg"><div class="cc-bar-fill espresso" data-w="33"></div></div>
+        </div>
+        <div class="cc-row">
+          <div class="cc-label"><span>Monster Energy 473ml</span><span>160mg</span></div>
+          <div class="cc-bar-bg"><div class="cc-bar-fill monster" data-w="84"></div></div>
+        </div>
+        <div class="cc-row">
+          <div class="cc-label"><span>Black Tea 240ml</span><span>47mg</span></div>
+          <div class="cc-bar-bg"><div class="cc-bar-fill tea" data-w="25"></div></div>
+        </div>
+        <div class="cc-row">
+          <div class="cc-label"><span>Cola 355ml</span><span>34mg</span></div>
+          <div class="cc-bar-bg"><div class="cc-bar-fill cola" data-w="18"></div></div>
+        </div>
+
+        <div style="margin-top:2rem;padding:1.25rem;background:var(--card);border:1px solid var(--border);border-radius:8px;">
+          <p style="font-size:.8rem;color:var(--muted);">
+            <strong style="color:var(--text);">Safe daily limit:</strong> The FDA recommends no more than <strong style="color:var(--red);">400mg of caffeine</strong> per day for healthy adults — that's roughly 5 cans of Red Bull. Most health bodies advise no more than 1–2 cans per day.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════════════════════════
+     TIMELINE — WHAT HAPPENS AFTER YOU DRINK IT
+══════════════════════════════════════════════════════ -->
+<section id="timeline">
+  <div class="section">
+    <div class="reveal">
+      <p class="section-label">Minute by Minute</p>
+      <h2 class="section-title">What Happens<br /><span>After You Drink It</span></h2>
+      <p style="color:var(--muted);max-width:560px;margin-top:.75rem;margin-bottom:3rem;">
+        Every sip sets off a cascade of biochemical events. Here's exactly what Red Bull does to your body — from the first millisecond to 12 hours later.
+      </p>
+    </div>
+
+    <div class="timeline-wrap reveal reveal-d1">
+      <div class="timeline-line"></div>
+      <div class="tl-items">
+
+        <div class="tl-item left">
+          <div class="tl-left">
+            <div class="tl-card">
+              <div class="tl-time">0–10 min</div>
+              <h4>First Absorption</h4>
+              <p>The moment you swallow, sugar absorption begins in the small intestine. Blood glucose rises, signalling your pancreas to release insulin. Heart rate and blood pressure begin a gentle climb as caffeine starts entering your bloodstream.</p>
+            </div>
+          </div>
+          <div class="tl-mid"><div class="tl-dot">⚡</div></div>
+          <div class="tl-right"></div>
+        </div>
+
+        <div class="tl-item right">
+          <div class="tl-left"></div>
+          <div class="tl-mid"><div class="tl-dot">🧠</div></div>
+          <div class="tl-right">
+            <div class="tl-card">
+              <div class="tl-time">15–45 min</div>
+              <h4>Peak Caffeine Effect</h4>
+              <p>Caffeine reaches peak blood concentration. It competes with adenosine (the sleepiness molecule) for receptor sites in the brain, effectively switching off fatigue signals. You experience:</p>
+              <ul>
+                <li>Increased alertness and concentration</li>
+                <li>Elevated mood (dopamine release)</li>
+                <li>Faster reaction times</li>
+                <li>Mild increase in heart rate (+10–15 bpm)</li>
+                <li>Slight blood pressure rise (+5–10 mmHg)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-item left">
+          <div class="tl-left">
+            <div class="tl-card">
+              <div class="tl-time">30–60 min</div>
+              <h4>Taurine &amp; B-Vitamin Synergy</h4>
+              <p>Taurine reaches peak levels, modulating calcium flow in heart muscle and acting as a neuromodulator — buffering some of caffeine's excitatory effects and potentially protecting cardiac cells from oxidative stress. B-vitamins facilitate cellular energy production via the Krebs cycle. Physical performance is near its peak.</p>
+            </div>
+          </div>
+          <div class="tl-mid"><div class="tl-dot">💪</div></div>
+          <div class="tl-right"></div>
+        </div>
+
+        <div class="tl-item right">
+          <div class="tl-left"></div>
+          <div class="tl-mid"><div class="tl-dot">📉</div></div>
+          <div class="tl-right">
+            <div class="tl-card">
+              <div class="tl-time">1–2 hours</div>
+              <h4>Sugar Crash &amp; Adaptation</h4>
+              <p>The initial glucose spike subsides. Insulin has done its job — blood sugar may dip below baseline, causing fatigue, irritability, or difficulty concentrating. Caffeine's effects are still present but the pleasant "lift" feeling diminishes as the brain begins down-regulating dopamine receptors in response to stimulation.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-item left">
+          <div class="tl-left">
+            <div class="tl-card">
+              <div class="tl-time">3–5 hours</div>
+              <h4>Half-Life Plateau</h4>
+              <p>Caffeine has a half-life of approximately 5–6 hours in most adults. About half the caffeine is still active in your bloodstream. The adenosine that was blocked earlier is now surging back — this adenosine rebound is the primary cause of the post-energy-drink "crash." Dehydration may be a factor if fluids were not replaced.</p>
+            </div>
+          </div>
+          <div class="tl-mid"><div class="tl-dot">⏳</div></div>
+          <div class="tl-right"></div>
+        </div>
+
+        <div class="tl-item right">
+          <div class="tl-left"></div>
+          <div class="tl-mid"><div class="tl-dot">😴</div></div>
+          <div class="tl-right">
+            <div class="tl-card">
+              <div class="tl-time">5–6 hours</div>
+              <h4>Caffeine Half-Life</h4>
+              <p>Caffeine concentration in the blood is now 40mg (half of 80mg). Alertness is returning toward baseline. If consumed in the afternoon, this is the phase where sleep may be disrupted — caffeine reduces total sleep time, delays REM onset, and decreases deep (slow-wave) sleep quality even when you don't feel wired.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-item left">
+          <div class="tl-left">
+            <div class="tl-card">
+              <div class="tl-time">12+ hours</div>
+              <h4>Clearance &amp; Withdrawal Risk</h4>
+              <p>For average metabolisers, most caffeine is cleared after 10–12 hours. Regular consumers may experience withdrawal symptoms (headache, fatigue, irritability) if the next "dose" is delayed. The body's adenosine system has adapted to expect caffeine, making unaided alertness harder. Tolerance builds rapidly — within 1–4 days of consistent use.</p>
+            </div>
+          </div>
+          <div class="tl-mid"><div class="tl-dot">🌙</div></div>
+          <div class="tl-right"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════════════════════════
+     BODY EFFECTS BY SYSTEM
+══════════════════════════════════════════════════════ -->
+<section id="effects">
+  <div class="section">
+    <div class="reveal">
+      <p class="section-label">Body Systems</p>
+      <h2 class="section-title">Effects on<br /><span>Every System</span></h2>
+    </div>
+    <div class="effects-intro reveal reveal-d1">
+      <p>Red Bull affects virtually every major organ system through caffeine's widespread receptor activity, the osmotic effects of sugar, taurine's modulatory role, and the vitamin co-factors. Here is a system-by-system breakdown.</p>
+    </div>
+
+    <div class="body-grid">
+
+      <div class="body-card reveal reveal-d1">
+        <div class="body-icon">🧠</div>
+        <h3>Central Nervous System</h3>
+        <p>Caffeine is the primary actor, blocking adenosine A1 and A2A receptors and elevating catecholamines (dopamine, noradrenaline).</p>
+        <ul class="effect-list">
+          <li class="pos">Increased wakefulness and alertness</li>
+          <li class="pos">Improved short-term memory consolidation</li>
+          <li class="pos">Enhanced reaction time (studies: ~11% faster)</li>
+          <li class="pos">Improved mood and motivation</li>
+          <li class="neg">Anxiety and jitteriness at high doses</li>
+          <li class="neg">Insomnia if consumed &lt;6h before sleep</li>
+          <li class="neg">Headaches during withdrawal</li>
+          <li class="neg">Dependence develops within 1–4 days</li>
+        </ul>
+      </div>
+
+      <div class="body-card reveal reveal-d2">
+        <div class="body-icon">❤️</div>
+        <h3>Cardiovascular System</h3>
+        <p>Caffeine and taurine have competing effects — caffeine is vasoconstrictive and chronotropic, while taurine is cardioprotective.</p>
+        <ul class="effect-list">
+          <li class="pos">Increased cardiac output during exercise</li>
+          <li class="pos">Taurine may reduce oxidative stress on heart</li>
+          <li class="neg">Increased heart rate (+10–20 bpm)</li>
+          <li class="neg">Elevated blood pressure (+5–15 mmHg systolic)</li>
+          <li class="neg">Palpitations at high doses or in sensitive individuals</li>
+          <li class="neg">Risk of arrhythmia when combined with alcohol</li>
+          <li class="neg">Contraindicated in hypertension, cardiac conditions</li>
+        </ul>
+      </div>
+
+      <div class="body-card reveal reveal-d3">
+        <div class="body-icon">🫁</div>
+        <h3>Respiratory System</h3>
+        <p>Caffeine acts as a mild bronchodilator, relaxing smooth muscle in the airways. It was historically used to treat asthma.</p>
+        <ul class="effect-list">
+          <li class="pos">Mild bronchodilation (opens airways)</li>
+          <li class="pos">Increased breathing rate supports exercise</li>
+          <li class="pos">May modestly reduce asthma symptoms short-term</li>
+          <li class="neu">Effects short-lived, not clinically significant</li>
+        </ul>
+      </div>
+
+      <div class="body-card reveal reveal-d1">
+        <div class="body-icon">🦴</div>
+        <h3>Musculoskeletal System</h3>
+        <p>Caffeine is well-documented as an ergogenic (performance-enhancing) aid recognised by WADA and studied extensively in sports science.</p>
+        <ul class="effect-list">
+          <li class="pos">Reduced perceived exertion (feel less tired)</li>
+          <li class="pos">Increased time to exhaustion (+2–5%)</li>
+          <li class="pos">Enhanced fat oxidation during exercise</li>
+          <li class="pos">Improved sprint performance and power output</li>
+          <li class="neg">High doses can cause muscle tremors</li>
+          <li class="neg">Excess sugar may cause GI discomfort during exercise</li>
+        </ul>
+      </div>
+
+      <div class="body-card reveal reveal-d2">
+        <div class="body-icon">🍽️</div>
+        <h3>Digestive System</h3>
+        <p>Both caffeine and carbonation directly stimulate the GI tract. The high sugar content adds an osmotic load.</p>
+        <ul class="effect-list">
+          <li class="pos">Stimulates bowel motility (useful for constipation)</li>
+          <li class="pos">Slightly increases metabolic rate</li>
+          <li class="neg">Stimulates gastric acid secretion — worsens acid reflux</li>
+          <li class="neg">High sugar content contributes to tooth enamel erosion</li>
+          <li class="neg">Bloating from carbonation</li>
+          <li class="neg">May cause GI cramps or diarrhoea at high volumes</li>
+        </ul>
+      </div>
+
+      <div class="body-card reveal reveal-d3">
+        <div class="body-icon">🫀</div>
+        <h3>Hormonal (Endocrine) System</h3>
+        <p>Caffeine triggers a stress-like hormonal cascade, activating the sympathetic nervous system via adrenal glands.</p>
+        <ul class="effect-list">
+          <li class="pos">Adrenaline release prepares body for activity</li>
+          <li class="pos">Cortisol elevation temporarily boosts focus</li>
+          <li class="pos">Increases insulin sensitivity acutely</li>
+          <li class="neg">Chronic high cortisol from daily use is counterproductive</li>
+          <li class="neg">Insulin spike from sugar followed by reactive hypoglycaemia</li>
+          <li class="neg">Can disrupt cortisol rhythm if consumed in morning fasted state</li>
+        </ul>
+      </div>
+
+      <div class="body-card reveal reveal-d1">
+        <div class="body-icon">🛡️</div>
+        <h3>Immune &amp; Antioxidant</h3>
+        <p>Taurine is a potent antioxidant and anti-inflammatory agent, and this is one of its primary benefits in the formula.</p>
+        <ul class="effect-list">
+          <li class="pos">Taurine scavenges free radicals (reduces oxidative stress)</li>
+          <li class="pos">Anti-inflammatory properties documented in studies</li>
+          <li class="pos">B-vitamins support immune cell energy requirements</li>
+          <li class="neu">Caffeine is neutral or mildly anti-inflammatory at low doses</li>
+          <li class="neg">High sugar promotes systemic inflammation over time</li>
+        </ul>
+      </div>
+
+      <div class="body-card reveal reveal-d2">
+        <div class="body-icon">💧</div>
+        <h3>Hydration &amp; Kidneys</h3>
+        <p>Caffeine is a diuretic — it inhibits ADH (antidiuretic hormone), causing kidneys to excrete more water. At moderate doses, this effect is minor.</p>
+        <ul class="effect-list">
+          <li class="neu">Mild diuresis at 80mg caffeine (largely offset by water content)</li>
+          <li class="neg">Can contribute to dehydration during prolonged exercise</li>
+          <li class="neg">Sodium (105mg/can) may increase water retention</li>
+          <li class="neg">Not suitable as a rehydration drink after sport</li>
+          <li class="neg">High taurine doses may stress kidneys in compromised individuals</li>
+        </ul>
+      </div>
+
+      <div class="body-card reveal reveal-d3">
+        <div class="body-icon">😴</div>
+        <h3>Sleep Architecture</h3>
+        <p>Even when you fall asleep normally after consuming caffeine, the quality of sleep is measurably reduced. This is one of the most under-recognised effects.</p>
+        <ul class="effect-list">
+          <li class="neg">Reduces total sleep time by 27–45 min on average</li>
+          <li class="neg">Delays sleep onset by 10–40 min</li>
+          <li class="neg">Reduces slow-wave (deep, restorative) sleep</li>
+          <li class="neg">Suppresses REM sleep in the first sleep cycle</li>
+          <li class="neg">Creates a cycle of fatigue → caffeine → poor sleep → more caffeine</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════════════════════════
+     HISTORY
+══════════════════════════════════════════════════════ -->
+<section id="history">
+  <div class="section">
+    <div class="reveal">
+      <p class="section-label">The Story</p>
+      <h2 class="section-title">From Thailand<br /><span>to the World</span></h2>
+      <p style="color:var(--muted);max-width:540px;margin-top:.75rem;">Red Bull's journey from a factory worker's tonic to a global empire worth over $20 billion is one of the most remarkable stories in modern marketing and brand-building.</p>
+    </div>
+
+    <div class="history-timeline reveal reveal-d1">
+
+      <div class="hist-event">
+        <div class="hist-year">1962</div>
+        <h4>Krating Daeng is Born</h4>
+        <p>Chaleo Yoovidhya launches Krating Daeng ("Red Bull" in Thai) in Thailand. It is a non-carbonated tonic aimed at truck drivers and factory workers who need to stay awake on long shifts. It becomes enormously popular among the Thai working class.</p>
+      </div>
+
+      <div class="hist-event">
+        <div class="hist-year">1982</div>
+        <h4>Dietrich Mateschitz Discovers the Drink</h4>
+        <p>Austrian entrepreneur Dietrich Mateschitz travels to Thailand on a business trip. He notices Krating Daeng in Thai shops and that it cures his jet lag. He spends the next two years developing a plan to bring it to Europe.</p>
+      </div>
+
+      <div class="hist-event">
+        <div class="hist-year">1984</div>
+        <h4>Red Bull GmbH Founded</h4>
+        <p>Mateschitz and Yoovidhya each invest $500,000 (50/50 partnership) to establish Red Bull GmbH in Fuschl am See, Austria. The formula is reformulated — carbonated, with a lighter taste — specifically for Western palates.</p>
+      </div>
+
+      <div class="hist-event">
+        <div class="hist-year">1987</div>
+        <h4>First Can Sold in Austria</h4>
+        <p>April 1, 1987 — the first Red Bull Energy Drink is sold in Austria. It is also the first energy drink to be sold in that country. The market is so new that Mateschitz essentially has to create the "energy drink" category from scratch.</p>
+      </div>
+
+      <div class="hist-event">
+        <div class="hist-year">1992</div>
+        <h4>European Expansion Begins</h4>
+        <p>Red Bull expands into Hungary, Slovenia, and Germany. The grassroots marketing strategy — free cans at universities, empty cans seeded in trash bins, sponsoring student events — creates a viral "underground cool" image that advertising money could not have bought.</p>
+      </div>
+
+      <div class="hist-event">
+        <div class="hist-year">1997</div>
+        <h4>Enters the United States</h4>
+        <p>Red Bull launches in California and New York. The tiny 8.4 oz can and premium price ($2–$3) are seen as differentiators, not disadvantages. Within two years it outsells all domestic energy drinks. The phrase "Red Bull gives you wings" becomes one of the most recognised slogans in advertising history.</p>
+      </div>
+
+      <div class="hist-event">
+        <div class="hist-year">2005</div>
+        <h4>Red Bull Racing F1 Team</h4>
+        <p>Red Bull acquires Jaguar Racing in Formula 1, rebranding it Red Bull Racing. In 2010–2013, the team wins four consecutive Constructors' and Drivers' Championships with Sebastian Vettel — transforming Red Bull's image into the world's most powerful extreme sports and racing brand.</p>
+      </div>
+
+      <div class="hist-event">
+        <div class="hist-year">2012</div>
+        <h4>Felix Baumgartner's Space Jump</h4>
+        <p>The "Stratos" project — sponsored entirely by Red Bull — sees skydiver Felix Baumgartner jump from a helium balloon at 39km (128,000 ft), breaking the sound barrier in freefall. Over 8 million people watch live on YouTube. It becomes the defining Red Bull content event and a masterclass in brand-aligned marketing.</p>
+      </div>
+
+      <div class="hist-event">
+        <div class="hist-year">2022–Now</div>
+        <h4>Dominance Continues</h4>
+        <p>Red Bull sells over 12.1 billion cans in 2023 across 175+ countries, generating €10.5 billion in revenue. Red Bull Racing wins back-to-back F1 championships with Max Verstappen. The brand remains the undisputed global leader in the energy drink category, with no signs of slowing down.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════════════════════════
+     THE SCIENCE
+══════════════════════════════════════════════════════ -->
+<section id="science">
+  <div class="section">
+    <div class="reveal">
+      <p class="section-label">Research</p>
+      <h2 class="section-title">The Science<br /><span>Behind the Buzz</span></h2>
+    </div>
+
+    <div class="science-cards">
+
+      <div class="sci-card reveal reveal-d1">
+        <span class="sci-label">Caffeine + Taurine</span>
+        <h3>Why the Combination Works Better Than Caffeine Alone</h3>
+        <p>Studies show that the caffeine-taurine pairing produces greater improvements in mood, memory, and reaction time than caffeine alone. Taurine modulates GABA receptors, reducing caffeine's anxiogenic (anxiety-producing) effects while preserving its alerting properties. This is why Red Bull feels "smoother" than plain espresso to many users.</p>
+      </div>
+
+      <div class="sci-card reveal reveal-d2">
+        <span class="sci-label">Ergogenics</span>
+        <h3>Athletic Performance: What the Research Actually Shows</h3>
+        <p>A 2019 meta-analysis (Journal of the International Society of Sports Nutrition) found that Red Bull-style energy drinks improve aerobic endurance performance by an average of 3–7%, anaerobic peak power by ~5%, and reduce perceived effort (RPE) by approximately 0.4 points on the Borg scale. The caffeine is the primary driver; sugar and taurine contribute synergistically.</p>
+      </div>
+
+      <div class="sci-card reveal reveal-d3">
+        <span class="sci-label">Cognition</span>
+        <h3>Cognitive Enhancement: Real or Placebo?</h3>
+        <p>A 2001 double-blind study (Psychopharmacology) using Red Bull vs. a matched placebo found statistically significant improvements in logical reasoning, reaction time, and sustained attention with the real drink. Effects were largely attributable to caffeine, but the combination drink outperformed caffeine-only control groups in mood measures — suggesting taurine and B-vitamins contribute meaningfully.</p>
+      </div>
+
+      <div class="sci-card reveal reveal-d1">
+        <span class="sci-label">Taurine Myth</span>
+        <h3>Does Red Bull Actually Contain Bull Bile?</h3>
+        <p>A persistent myth claims Red Bull's taurine is extracted from bull semen or bile. This is false. Red Bull uses synthetically manufactured taurine, produced by reacting aziridine with sulfurous acid. Synthetic taurine is chemically identical to natural taurine and has been used safely in infant formula, sports supplements, and cat food for decades.</p>
+      </div>
+
+      <div class="sci-card reveal reveal-d2">
+        <span class="sci-label">Cardiovascular Risk</span>
+        <h3>Is One Can Dangerous for Your Heart?</h3>
+        <p>For healthy adults without cardiac conditions, a single 250ml Red Bull causes modest and transient increases in heart rate and blood pressure that are within normal physiological ranges. A 2020 study (Journal of the American Heart Association) found that energy drink consumption was associated with prolonged QTc intervals, a marker of arrhythmia risk — but primarily with larger volumes (2+ cans) or pre-existing vulnerabilities.</p>
+      </div>
+
+      <div class="sci-card reveal reveal-d3">
+        <span class="sci-label">Alcohol Mixing</span>
+        <h3>Why You Shouldn't Mix Red Bull with Alcohol</h3>
+        <p>Caffeine is a stimulant, alcohol a depressant. When combined, caffeine masks the sedative cues that normally signal to drinkers that they've had enough, leading to consuming more alcohol than intended. Studies consistently show that "Red Bull &amp; Vodka" drinkers consume more alcohol, have higher blood alcohol levels, and are significantly more likely to engage in risky behaviour than those who drink alcohol alone.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════════════════════════
+     WARNINGS &amp; SAFETY
+══════════════════════════════════════════════════════ -->
+<section id="warnings">
+  <div class="section">
+    <div class="reveal">
+      <p class="section-label">Safety Guide</p>
+      <h2 class="section-title">Who Should<br /><span>Be Careful</span></h2>
+    </div>
+
+    <div class="warn-banner reveal reveal-d1">
+      <div class="icon">⚠️</div>
+      <p>
+        <strong>Important:</strong> Red Bull is generally safe for healthy adults when consumed in moderation (1–2 cans per day). However, certain groups face significantly elevated risks. The following guidance is based on regulatory advice from the EFSA, FDA, and WHO, as well as peer-reviewed clinical literature.
+      </p>
+    </div>
+
+    <div class="warn-grid">
+
+      <div class="warn-card reveal reveal-d1">
+        <div class="wi">🧒</div>
+        <h4>Children &amp; Adolescents</h4>
+        <p>No safe level of consumption has been established for under-18s. The developing brain is especially sensitive to caffeine's effects on sleep, anxiety, and cardiac function. Multiple countries have banned sales to minors.</p>
+      </div>
+
+      <div class="warn-card reveal reveal-d2">
+        <div class="wi">🤰</div>
+        <h4>Pregnancy &amp; Breastfeeding</h4>
+        <p>Caffeine crosses the placenta. The WHO recommends &lt;200mg/day during pregnancy. Red Bull Sugar-free also contains sweeteners not recommended in pregnancy. Breastfeeding mothers should limit intake to &lt;1 can/day.</p>
+      </div>
+
+      <div class="warn-card reveal reveal-d3">
+        <div class="wi">❤️‍🩹</div>
+        <h4>Cardiac Conditions</h4>
+        <p>People with arrhythmias, hypertension, heart disease, or structural cardiac abnormalities should avoid energy drinks entirely. Cases of cardiac arrest, atrial fibrillation, and ventricular tachycardia have been linked to high energy drink consumption in susceptible individuals.</p>
+      </div>
+
+      <div class="warn-card reveal reveal-d1">
+        <div class="wi">😰</div>
+        <h4>Anxiety Disorders</h4>
+        <p>Caffeine directly stimulates the sympathetic nervous system, mimicking anxiety. For those with generalised anxiety disorder, panic disorder, or PTSD, even one can can trigger or worsen symptoms — including panic attacks and hypervigilance.</p>
+      </div>
+
+      <div class="warn-card reveal reveal-d2">
+        <div class="wi">💊</div>
+        <h4>Medication Interactions</h4>
+        <p>Red Bull interacts with certain medications: MAOI antidepressants (dangerous hypertension), Adderall/Ritalin (compounding cardiovascular load), anticoagulants (B vitamins affect clotting), and antibiotics like ciprofloxacin (slows caffeine clearance up to 400%).</p>
+      </div>
+
+      <div class="warn-card reveal reveal-d3">
+        <div class="wi">🍺</div>
+        <h4>Combined with Alcohol</h4>
+        <p>Mixing Red Bull with alcohol is categorically unsafe. See the Science section above. The combination is associated with increased alcohol consumption, more dangerous behaviour, impaired judgement while feeling alert, and a higher rate of alcohol poisoning hospitalisations.</p>
+      </div>
+
+      <div class="warn-card reveal reveal-d1">
+        <div class="wi">🏃</div>
+        <h4>During Intense Exercise</h4>
+        <p>Red Bull is not a sports drink. The carbonation, sugar, and caffeine can cause GI distress during high-intensity exercise. It does not replace electrolytes lost through sweat. Consuming it immediately before or during endurance events in hot conditions risks dehydration and heat illness.</p>
+      </div>
+
+      <div class="warn-card reveal reveal-d2">
+        <div class="wi">🩸</div>
+        <h4>Diabetes &amp; Blood Sugar Issues</h4>
+        <p>The original formula contains 27g of sugar per can. For people with type 1 or 2 diabetes, this represents a significant glucose load. The sugar-free version avoids this, but aspartame may affect gut microbiome composition and insulin response in some individuals.</p>
+      </div>
+
+    </div>
+
+    <div class="dosage-note reveal reveal-d2">
+      <h3>Recommended Limits at a Glance</h3>
+      <div class="dosage-grid">
+        <div class="dosage-item">
+          <span class="val">1–2</span>
+          <span class="key">Cans per day max (healthy adult)</span>
+        </div>
+        <div class="dosage-item">
+          <span class="val">400mg</span>
+          <span class="key">FDA max daily caffeine (adult)</span>
+        </div>
+        <div class="dosage-item">
+          <span class="val">200mg</span>
+          <span class="key">Max during pregnancy</span>
+        </div>
+        <div class="dosage-item">
+          <span class="val">0</span>
+          <span class="key">Cans recommended for under-18s</span>
+        </div>
+        <div class="dosage-item">
+          <span class="val">6h</span>
+          <span class="key">Buffer before sleep (minimum)</span>
+        </div>
+        <div class="dosage-item">
+          <span class="val">0</span>
+          <span class="key">Mixed with alcohol — never</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <span>Red Bull — Complete Information Guide</span>
+  <span>Information compiled from EFSA, FDA, WHO &amp; peer-reviewed literature · Educational use only</span>
+  <span>Not affiliated with Red Bull GmbH</span>
+</footer>
+
+<!-- ════════════════════════════════════════════════════════
+     SCRIPTS
+════════════════════════════════════════════════════════ -->
+<script>
+/* ── CUSTOM CURSOR ────────────────────────────────────── */
+const cursor = document.getElementById('cursor');
+const ring   = document.getElementById('cursor-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx + 'px';
+  cursor.style.top  = my + 'px';
+});
+(function animRing() {
+  rx += (mx - rx) * .12;
+  ry += (my - ry) * .12;
+  ring.style.left = rx + 'px';
+  ring.style.top  = ry + 'px';
+  requestAnimationFrame(animRing);
+})();
+document.querySelectorAll('a, button').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    cursor.style.width = '18px'; cursor.style.height = '18px';
+    ring.style.transform = 'translate(-50%,-50%) scale(1.5)';
+  });
+  el.addEventListener('mouseleave', () => {
+    cursor.style.width = '10px'; cursor.style.height = '10px';
+    ring.style.transform = 'translate(-50%,-50%) scale(1)';
+  });
+});
+
+/* ── NAV SCROLL ───────────────────────────────────────── */
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', scrollY > 60);
+});
+
+/* ── CANVAS BACKGROUND ────────────────────────────────── */
+const canvas = document.getElementById('bg-canvas');
+const ctx    = canvas.getContext('2d');
+let W, H, particles = [], bolts = [], t = 0;
+
+function resize() {
+  W = canvas.width  = innerWidth;
+  H = canvas.height = innerHeight;
+  initParticles();
+}
+
+function initParticles() {
+  particles = [];
+  const n = Math.floor(W * H / 6000);
+  for (let i = 0; i < n; i++) {
+    particles.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      r: Math.random() * 1.2 + .2,
+      vx: (Math.random() - .5) * .15,
+      vy: (Math.random() - .5) * .15,
+      phase: Math.random() * Math.PI * 2,
+      speed: .4 + Math.random() * .6,
+      hue: Math.random() < .7 ? 'red' : 'blue'
+    });
+  }
+}
+
+function drawParticles() {
+  particles.forEach(p => {
+    p.x += p.vx; p.y += p.vy;
+    if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+    if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+    const a = .15 + .15 * Math.sin(t * p.speed * .015 + p.phase);
+    const col = p.hue === 'red'
+      ? `rgba(200,16,46,${a})`
+      : `rgba(0,70,180,${a})`;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = col;
+    ctx.fill();
+  });
+}
+
+// Subtle energy bolt effect
+function maybeBolt() {
+  if (Math.random() < .004) {
+    const x = Math.random() * W;
+    bolts.push({ x, y: 0, life: 1, segs: buildBolt(x, 0, x + (Math.random()-0.5)*120, H * .4) });
+  }
+  bolts = bolts.filter(b => b.life > 0);
+  bolts.forEach(b => {
+    b.life -= .04;
+    ctx.globalAlpha = b.life * .3;
+    ctx.strokeStyle = 'rgba(200,16,46,0.8)';
+    ctx.lineWidth = .8;
+    ctx.shadowColor = 'rgba(200,16,46,0.6)';
+    ctx.shadowBlur = 6;
+    ctx.beginPath();
+    b.segs.forEach((s, i) => i === 0 ? ctx.moveTo(s.x, s.y) : ctx.lineTo(s.x, s.y));
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha = 1;
+  });
+}
+
+function buildBolt(x1, y1, x2, y2, depth = 0) {
+  if (depth > 4) return [{x:x1,y:y1},{x:x2,y:y2}];
+  const mx = (x1+x2)/2 + (Math.random()-.5) * 40;
+  const my = (y1+y2)/2 + (Math.random()-.5) * 20;
+  return [...buildBolt(x1,y1,mx,my,depth+1), ...buildBolt(mx,my,x2,y2,depth+1)];
+}
+
+function drawGlow() {
+  // Red glow top-left
+  const g1 = ctx.createRadialGradient(W*.1, H*.1, 0, W*.1, H*.1, W*.35);
+  g1.addColorStop(0, 'rgba(200,16,46,0.06)');
+  g1.addColorStop(1, 'rgba(200,16,46,0)');
+  ctx.fillStyle = g1; ctx.fillRect(0,0,W,H);
+
+  // Blue glow bottom-right
+  const g2 = ctx.createRadialGradient(W*.9, H*.8, 0, W*.9, H*.8, W*.4);
+  g2.addColorStop(0, 'rgba(0,70,180,0.06)');
+  g2.addColorStop(1, 'rgba(0,70,180,0)');
+  ctx.fillStyle = g2; ctx.fillRect(0,0,W,H);
+}
+
+function animate() {
+  t++;
+  ctx.clearRect(0, 0, W, H);
+  drawGlow();
+  drawParticles();
+  maybeBolt();
+  requestAnimationFrame(animate);
+}
+
+window.addEventListener('resize', resize);
+resize();
+animate();
+
+/* ── SCROLL REVEAL ────────────────────────────────────── */
+const revObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: .1 });
+document.querySelectorAll('.reveal').forEach(el => revObs.observe(el));
+
+/* ── NUTRITION BARS ───────────────────────────────────── */
+const barObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.nut-bar-fill, .cc-bar-fill').forEach(bar => {
+        bar.style.width = bar.dataset.w + '%';
+      });
+    }
+  });
+}, { threshold: .2 });
+document.querySelectorAll('.nutrition-panel').forEach(el => barObs.observe(el));
+</script>
+</body>
+</html>
