@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Claude & Claude Pro — How-To Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --night:      #060d18;
+      --deep-navy:  #0b1625;
+      --navy:       #0f2040;
+      --ocean:      #1a6b8a;
+      --wave:       #2196b0;
+      --foam:       #7bd4e8;
+      --foam-pale:  #b8edf7;
+      --sand:       #c8a96e;
+      --sand-light: #e8cc99;
+      --sand-pale:  #f5e8cc;
+      --text-primary: #e8dcc8;
+      --text-muted:   #8fa3b8;
+      --text-faint:   #3d5268;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--night);
+      color: var(--text-primary);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ── Cursor ── */
+    .cursor { position: fixed; width: 8px; height: 8px; background: var(--foam); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: transform .15s ease; }
+    .cursor-ring { position: fixed; width: 36px; height: 36px; border: 1.5px solid var(--foam); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); transition: transform .4s ease, width .3s ease, height .3s ease, opacity .3s ease; }
+    body:hover .cursor { transform: translate(-50%,-50%) scale(1.2); }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.4rem 4rem;
+      transition: background .4s ease, padding .4s ease;
+    }
+    nav.scrolled { background: rgba(6,13,24,.92); backdrop-filter: blur(12px); padding: 1rem 4rem; border-bottom: 1px solid rgba(123,212,232,.08); }
+    .nav-logo { font-family: 'DM Mono', monospace; font-size: .85rem; letter-spacing: .12em; color: var(--foam); text-decoration: none; }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a { font-family: 'DM Mono', monospace; font-size: .72rem; letter-spacing: .14em; color: var(--text-muted); text-decoration: none; text-transform: uppercase; transition: color .3s; }
+    .nav-links a:hover { color: var(--foam); }
+    .nav-home { font-family: 'DM Mono', monospace; font-size: .72rem; letter-spacing: .14em; color: var(--text-muted); text-decoration: none; text-transform: uppercase; transition: color .3s; }
+    .nav-home:hover { color: var(--foam); }
+
+    /* ── Hero ── */
+    .hero {
+      min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 8rem 2rem 4rem; position: relative;
+    }
+    .hero-eyebrow { font-family: 'DM Mono', monospace; font-size: .75rem; letter-spacing: .2em; color: var(--foam); text-transform: uppercase; margin-bottom: 1.5rem; opacity: 0; animation: fadeUp .8s ease forwards .2s; }
+    .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(2.8rem, 7vw, 5.5rem); font-weight: 700; line-height: 1.1; color: var(--sand-pale); margin-bottom: 1.5rem; opacity: 0; animation: fadeUp .8s ease forwards .4s; }
+    .hero-title em { font-style: italic; color: var(--foam); }
+    .hero-sub { font-size: 1.05rem; color: var(--text-muted); max-width: 540px; margin: 0 auto 3rem; opacity: 0; animation: fadeUp .8s ease forwards .6s; }
+    .hero-badge { display: inline-flex; align-items: center; gap: .6rem; background: rgba(123,212,232,.08); border: 1px solid rgba(123,212,232,.2); border-radius: 2rem; padding: .5rem 1.2rem; font-family: 'DM Mono', monospace; font-size: .72rem; letter-spacing: .1em; color: var(--foam); opacity: 0; animation: fadeUp .8s ease forwards .8s; }
+    .badge-dot { width: 6px; height: 6px; background: var(--foam); border-radius: 50%; animation: pulse 2s ease infinite; }
+
+    /* ── Canvas ── */
+    #scene-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+    .hero, section, footer { position: relative; z-index: 1; }
+
+    /* ── Sections ── */
+    section { padding: 6rem 2rem; max-width: 860px; margin: 0 auto; }
+    .section-label { font-family: 'DM Mono', monospace; font-size: .72rem; letter-spacing: .2em; text-transform: uppercase; color: var(--foam); margin-bottom: 1rem; display: block; }
+    .section-title { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 700; color: var(--sand-pale); margin-bottom: 2rem; line-height: 1.2; }
+    .section-title em { font-style: italic; color: var(--foam); }
+    .section-divider { width: 48px; height: 2px; background: linear-gradient(90deg, var(--foam), transparent); margin-bottom: 2.5rem; }
+
+    /* ── Cards ── */
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 2.5rem; }
+    .card {
+      background: rgba(11,22,37,.6); border: 1px solid rgba(123,212,232,.1);
+      border-radius: 12px; padding: 1.8rem; backdrop-filter: blur(8px);
+      transition: transform .3s ease, border-color .3s ease, box-shadow .3s ease;
+    }
+    .card:hover { transform: translateY(-4px); border-color: rgba(123,212,232,.28); box-shadow: 0 12px 40px rgba(0,0,0,.35); }
+    .card-icon { font-size: 1.8rem; margin-bottom: 1rem; }
+    .card-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--sand-light); margin-bottom: .6rem; }
+    .card-text { font-size: .88rem; color: var(--text-muted); line-height: 1.65; }
+
+    /* ── Steps ── */
+    .steps { display: flex; flex-direction: column; gap: 2rem; margin-top: 2.5rem; }
+    .step { display: flex; gap: 1.5rem; align-items: flex-start; }
+    .step-num { flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; background: rgba(123,212,232,.12); border: 1.5px solid rgba(123,212,232,.3); display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: .78rem; color: var(--foam); }
+    .step-body { flex: 1; }
+    .step-title { font-family: 'Playfair Display', serif; font-size: 1.05rem; color: var(--sand-light); margin-bottom: .4rem; }
+    .step-text { font-size: .88rem; color: var(--text-muted); line-height: 1.65; }
+    .step-text code { background: rgba(123,212,232,.1); color: var(--foam); padding: .1rem .4rem; border-radius: 4px; font-family: 'DM Mono', monospace; font-size: .82rem; }
+
+    /* ── Tips ── */
+    .tip-list { list-style: none; display: flex; flex-direction: column; gap: 1rem; margin-top: 2rem; }
+    .tip-list li { display: flex; gap: 1rem; align-items: flex-start; font-size: .9rem; color: var(--text-muted); line-height: 1.6; }
+    .tip-list li::before { content: '—'; color: var(--foam); flex-shrink: 0; font-family: 'DM Mono', monospace; }
+    .tip-list li strong { color: var(--text-primary); }
+
+    /* ── Callout ── */
+    .callout { background: rgba(123,212,232,.06); border-left: 3px solid var(--foam); border-radius: 0 8px 8px 0; padding: 1.2rem 1.6rem; margin: 2rem 0; font-size: .9rem; color: var(--text-muted); line-height: 1.7; }
+    .callout strong { color: var(--foam); }
+
+    /* ── Table ── */
+    .plan-table { width: 100%; border-collapse: collapse; margin-top: 2rem; font-size: .88rem; }
+    .plan-table th { font-family: 'DM Mono', monospace; font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; color: var(--foam); padding: .8rem 1rem; text-align: left; border-bottom: 1px solid rgba(123,212,232,.15); }
+    .plan-table td { padding: .8rem 1rem; border-bottom: 1px solid rgba(255,255,255,.04); color: var(--text-muted); vertical-align: top; }
+    .plan-table tr:last-child td { border-bottom: none; }
+    .plan-table .check { color: var(--foam); }
+    .plan-table .cross { color: var(--text-faint); }
+    .plan-table .feature { color: var(--text-primary); font-weight: 400; }
+    .plan-table .highlight { background: rgba(123,212,232,.04); }
+
+    /* ── Prompt examples ── */
+    .prompt-block { background: rgba(6,13,24,.8); border: 1px solid rgba(123,212,232,.15); border-radius: 8px; padding: 1.2rem 1.4rem; margin: 1.2rem 0; font-family: 'DM Mono', monospace; font-size: .82rem; color: var(--sand-light); line-height: 1.7; position: relative; }
+    .prompt-block::before { content: 'prompt'; position: absolute; top: -8px; left: 14px; background: var(--night); padding: 0 .5rem; font-size: .65rem; letter-spacing: .1em; text-transform: uppercase; color: var(--foam); }
+
+    /* ── Footer ── */
+    footer { text-align: center; padding: 3rem 2rem; border-top: 1px solid rgba(123,212,232,.08); font-family: 'DM Mono', monospace; font-size: .72rem; letter-spacing: .1em; color: var(--text-faint); position: relative; z-index: 1; }
+    footer a { color: var(--foam); text-decoration: none; }
+
+    /* ── Animations ── */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .5; transform: scale(.8); } }
+
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.5rem; }
+      nav.scrolled { padding: .8rem 1.5rem; }
+      .nav-links { display: none; }
+      .card-grid { grid-template-columns: 1fr; }
+      .step { flex-direction: column; gap: .8rem; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="scene-canvas"></canvas>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+
+<!-- Nav -->
+<nav id="nav">
+  <a href="index.html" class="nav-logo">Jayden Blake</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="#summary">Summary</a></li>
+    <li><a href="#plans">Plans</a></li>
+    <li><a href="#prompting">Prompting</a></li>
+    <li><a href="#claude-code">Claude Code</a></li>
+    <li><a href="#tips">Tips</a></li>
+  </ul>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+  <p class="hero-eyebrow">Your complete reference</p>
+  <h1 class="hero-title">Claude &amp; <em>Claude Pro</em><br>How-To Guide</h1>
+  <p class="hero-sub">Everything you need to get the most out of Claude — from picking the right plan to writing great prompts and using Claude Code.</p>
+  <div class="hero-badge"><span class="badge-dot"></span> Updated June 2026</div>
+</div>
+
+<!-- ── What is Claude? ── -->
+<section id="summary">
+  <span class="section-label reveal">01 — Overview</span>
+  <h2 class="section-title reveal">What is <em>Claude</em>?</h2>
+  <div class="section-divider reveal"></div>
+  <p class="reveal" style="color:var(--text-muted);font-size:.95rem;margin-bottom:1.5rem;">
+    Claude is an AI assistant made by <strong style="color:var(--text-primary)">Anthropic</strong>. It understands and generates text, reads files, writes and debugs code, analyses documents, and holds long, coherent conversations. The underlying models are named in the <strong style="color:var(--text-primary)">Claude 4</strong> family (Opus, Sonnet, Haiku), each trading off speed vs. capability.
+  </p>
+  <div class="card-grid">
+    <div class="card reveal">
+      <div class="card-icon">&#128366;</div>
+      <div class="card-title">Claude Opus 4</div>
+      <div class="card-text">The most powerful model. Best for complex reasoning, long documents, nuanced writing, and hard coding tasks. Slower and uses more credits.</div>
+    </div>
+    <div class="card reveal">
+      <div class="card-icon">&#9889;</div>
+      <div class="card-title">Claude Sonnet 4</div>
+      <div class="card-text">The balanced workhorse. Fast, smart, and cost-efficient. The default for most everyday tasks — coding, drafting, research, Q&amp;A.</div>
+    </div>
+    <div class="card reveal">
+      <div class="card-icon">&#128640;</div>
+      <div class="card-title">Claude Haiku 4</div>
+      <div class="card-text">The lightest model. Near-instant replies, great for quick lookups, simple edits, or building apps where latency matters.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Plans ── -->
+<section id="plans">
+  <span class="section-label reveal">02 — Plans</span>
+  <h2 class="section-title reveal">Free vs <em>Pro</em></h2>
+  <div class="section-divider reveal"></div>
+
+  <div class="callout reveal">
+    <strong>Claude Pro</strong> (US $20/month) gives you significantly higher usage limits, priority access during busy periods, early access to new features, and the ability to use the most powerful models without rationing.
+  </div>
+
+  <table class="plan-table reveal">
+    <thead>
+      <tr>
+        <th>Feature</th>
+        <th>Free</th>
+        <th>Pro ($20/mo)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="feature">Access to Claude Sonnet</td>
+        <td class="check">&#10003;</td>
+        <td class="check">&#10003;</td>
+      </tr>
+      <tr class="highlight">
+        <td class="feature">Access to Claude Opus (most powerful)</td>
+        <td class="cross">&#8212;</td>
+        <td class="check">&#10003;</td>
+      </tr>
+      <tr>
+        <td class="feature">Usage limits</td>
+        <td>Low daily cap</td>
+        <td>5× higher limit</td>
+      </tr>
+      <tr class="highlight">
+        <td class="feature">Priority access (busy periods)</td>
+        <td class="cross">&#8212;</td>
+        <td class="check">&#10003;</td>
+      </tr>
+      <tr>
+        <td class="feature">Projects &amp; persistent memory</td>
+        <td class="cross">&#8212;</td>
+        <td class="check">&#10003;</td>
+      </tr>
+      <tr class="highlight">
+        <td class="feature">File &amp; image uploads</td>
+        <td>Limited</td>
+        <td class="check">Full access</td>
+      </tr>
+      <tr>
+        <td class="feature">Early feature access</td>
+        <td class="cross">&#8212;</td>
+        <td class="check">&#10003;</td>
+      </tr>
+      <tr class="highlight">
+        <td class="feature">Claude Code (CLI tool)</td>
+        <td class="cross">&#8212;</td>
+        <td class="check">&#10003; (included)</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ── Prompting ── -->
+<section id="prompting">
+  <span class="section-label reveal">03 — Prompting</span>
+  <h2 class="section-title reveal">Writing <em>Great</em> Prompts</h2>
+  <div class="section-divider reveal"></div>
+  <p class="reveal" style="color:var(--text-muted);font-size:.95rem;margin-bottom:2rem;">The biggest difference between a mediocre result and a great one is almost always the prompt. Claude is literal — the more precisely you describe what you want, the better it performs.</p>
+
+  <div class="steps">
+    <div class="step reveal">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">Give context first</div>
+        <div class="step-text">Tell Claude <em>who you are</em>, <em>what you're building</em>, and <em>why</em> before asking your question. Context shapes the answer.
+          <div class="prompt-block">I'm a junior developer building a personal portfolio site in plain HTML/CSS. Explain how CSS Grid works in simple terms and give me a 3-column card layout example.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step reveal">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">Specify the format you want</div>
+        <div class="step-text">Ask for bullet points, numbered steps, a table, code with comments, or a short paragraph. Claude matches whatever format you request.
+          <div class="prompt-block">Give me a comparison of React vs Vue in a markdown table with columns: Learning Curve, Performance, Ecosystem, Best For.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step reveal">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">Constrain length and tone</div>
+        <div class="step-text">Add phrases like <code>"in under 150 words"</code>, <code>"be concise"</code>, <code>"explain like I'm 15"</code>, or <code>"professional tone"</code> to get exactly what you need.</div>
+      </div>
+    </div>
+
+    <div class="step reveal">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="step-title">Provide examples (few-shot prompting)</div>
+        <div class="step-text">Show Claude a sample of what "good" looks like. It will match the pattern for your actual request.
+          <div class="prompt-block">Convert these function names to snake_case. Examples: getUserData → get_user_data, fetchItems → fetch_items. Now convert: calculateTotalPrice, sendEmailNotification, parseUserInput.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step reveal">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <div class="step-title">Iterate — don't start over</div>
+        <div class="step-text">Claude remembers the whole conversation. Follow up with <code>"make it shorter"</code>, <code>"use TypeScript instead"</code>, or <code>"now add error handling"</code> — no need to repeat yourself.</div>
+      </div>
+    </div>
+
+    <div class="step reveal">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <div class="step-title">Use Projects for ongoing work</div>
+        <div class="step-text">(Pro only) A <strong>Project</strong> on claude.ai gives Claude persistent memory of your codebase, style guide, or background info across every conversation in that project. Set it up once with a system prompt, then every chat already knows your context.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Claude Code ── -->
+<section id="claude-code">
+  <span class="section-label reveal">04 — Claude Code</span>
+  <h2 class="section-title reveal"><em>Claude Code</em> — The CLI</h2>
+  <div class="section-divider reveal"></div>
+  <p class="reveal" style="color:var(--text-muted);font-size:.95rem;margin-bottom:2rem;">Claude Code is a command-line tool that puts Claude directly inside your terminal (or IDE). It reads your actual files, runs commands, edits code, and commits to git — no copy-pasting required. This very guide was created with it.</p>
+
+  <div class="steps">
+    <div class="step reveal">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">Install</div>
+        <div class="step-text">Requires Node.js 18+. Install globally with npm:
+          <div class="prompt-block">npm install -g @anthropic-ai/claude-code</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step reveal">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">Start a session</div>
+        <div class="step-text">Navigate to your project folder and run <code>claude</code>. The first run will ask you to log in with your Anthropic/Claude.ai account.
+          <div class="prompt-block">cd my-project<br>claude</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step reveal">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">Talk to it naturally</div>
+        <div class="step-text">Just describe what you want. Claude Code can read, write, search, and run things in your repo. You approve anything that looks risky before it runs.
+          <div class="prompt-block">Add a dark-mode toggle to my index.html using CSS variables and a small JS button in the nav.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step reveal">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="step-title">Key slash commands</div>
+        <div class="step-text">
+          <code>/help</code> — show all commands<br>
+          <code>/clear</code> — clear the conversation context<br>
+          <code>/review</code> — review the current git diff<br>
+          <code>/compact</code> — summarise conversation to save context<br>
+          <code>/config</code> — open settings (model, theme, etc.)
+        </div>
+      </div>
+    </div>
+
+    <div class="step reveal">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <div class="step-title">Use a CLAUDE.md file</div>
+        <div class="step-text">Put a <code>CLAUDE.md</code> file in the root of your project. Claude Code reads it automatically at the start of every session — put your stack info, coding conventions, and preferred patterns there so you never have to explain them again.</div>
+      </div>
+    </div>
+
+    <div class="step reveal">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <div class="step-title">IDE integration</div>
+        <div class="step-text">Claude Code has official extensions for <strong style="color:var(--text-primary)">VS Code</strong> and <strong style="color:var(--text-primary)">JetBrains</strong>. Search "Claude Code" in the extensions marketplace. This opens a side panel so you never leave your editor.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Tips ── -->
+<section id="tips">
+  <span class="section-label reveal">05 — Best Practices</span>
+  <h2 class="section-title reveal">Pro <em>Tips</em></h2>
+  <div class="section-divider reveal"></div>
+
+  <ul class="tip-list">
+    <li class="reveal"><strong>Pick the right model for the job.</strong> Use Sonnet for everyday tasks — it's fast and smart. Save Opus for genuinely hard problems (complex architecture, long document analysis). This keeps your usage limits healthy.</li>
+    <li class="reveal"><strong>Context window is precious.</strong> Very long conversations degrade quality as older messages scroll out. Use <code>/compact</code> or start a fresh conversation when a topic is done.</li>
+    <li class="reveal"><strong>Be specific about constraints.</strong> "Write a function that does X" is weaker than "Write a pure JavaScript function (no dependencies) that does X, handles null input, and includes a JSDoc comment."</li>
+    <li class="reveal"><strong>Use Projects for recurring work.</strong> (Pro) Create a Project for each ongoing codebase or client. Add a system prompt describing the stack and your preferences. Every conversation inherits that context automatically.</li>
+    <li class="reveal"><strong>Upload your files.</strong> Claude can read PDFs, images, code files, CSV data, and more. Paste or upload the source material — don't try to summarise it yourself.</li>
+    <li class="reveal"><strong>Ask Claude to verify itself.</strong> After a complex answer, follow up with "Are you confident in this? What could go wrong?" — Claude is good at self-critique and will flag uncertainties honestly.</li>
+    <li class="reveal"><strong>Don't accept the first draft.</strong> Claude excels at iteration. Ask it to "make this more concise", "add edge-case handling", or "rewrite in a more conversational tone" — each pass is usually significantly better.</li>
+    <li class="reveal"><strong>For code: provide the error message.</strong> Paste the exact stack trace or error output. Claude diagnoses from real errors far more accurately than from descriptions of errors.</li>
+    <li class="reveal"><strong>Trust but verify.</strong> Claude is very capable but not infallible. Always review generated code before running it in production, and check factual claims on anything high-stakes.</li>
+    <li class="reveal"><strong>Claude Code: stay in the repo.</strong> Claude Code works best when you're in the project directory. It reads your actual files rather than relying on descriptions — the less you have to explain, the better the results.</li>
+  </ul>
+</section>
+
+<!-- Footer -->
+<footer>
+  <p>Made with Claude Code &mdash; <a href="index.html">Back to portfolio</a></p>
+  <p style="margin-top:.5rem;">&#169; 2026 Jayden Blake</p>
+</footer>
+
+<script>
+  // ── Custom cursor ──
+  const cursor = document.getElementById('cursor');
+  const ring   = document.getElementById('cursor-ring');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top  = e.clientY + 'px';
+    ring.style.left   = e.clientX + 'px';
+    ring.style.top    = e.clientY + 'px';
+  });
+
+  // ── Nav scroll ──
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  // ── Reveal on scroll ──
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 60);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // ── Canvas background (stars + subtle gradient) ──
+  const canvas = document.getElementById('scene-canvas');
+  const ctx    = canvas.getContext('2d');
+  let W, H, stars = [];
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    stars = Array.from({ length: 120 }, () => ({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      r: Math.random() * 1.2 + .2,
+      o: Math.random(),
+      s: Math.random() * .008 + .002
+    }));
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    const grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, '#060d18');
+    grad.addColorStop(1, '#0b1625');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    stars.forEach(s => {
+      s.o += s.s;
+      if (s.o > 1 || s.o < 0) s.s = -s.s;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(123,212,232,${s.o * .7})`;
+      ctx.fill();
+    });
+
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+  draw();
+</script>
+</body>
+</html>
