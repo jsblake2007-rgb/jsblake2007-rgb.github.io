@@ -133,7 +133,8 @@
     @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .5; transform: scale(.8); } }
 
-    .reveal { opacity: 0; transform: translateY(20px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal { transition: opacity .7s ease, transform .7s ease; }
+    .reveal.hide { opacity: 0; transform: translateY(20px); }
     .reveal.visible { opacity: 1; transform: none; }
 
     /* ── Responsive ── */
@@ -441,15 +442,32 @@
   });
 
   // ── Reveal on scroll ──
+  // Elements start visible; JS adds 'hide' before observing so content
+  // is always readable even if the observer fails (e.g. local file://)
   const observer = new IntersectionObserver(entries => {
     entries.forEach((e, i) => {
       if (e.isIntersecting) {
-        setTimeout(() => e.target.classList.add('visible'), i * 60);
+        setTimeout(() => {
+          e.target.classList.remove('hide');
+          e.target.classList.add('visible');
+        }, i * 60);
         observer.unobserve(e.target);
       }
     });
-  }, { threshold: 0.12 });
-  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  }, { threshold: 0.08, rootMargin: '0px 0px -20px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(el => {
+    el.classList.add('hide');
+    observer.observe(el);
+  });
+
+  // Fallback: force all reveals visible after 1.5s in case observer misses them
+  setTimeout(() => {
+    document.querySelectorAll('.reveal').forEach(el => {
+      el.classList.remove('hide');
+      el.classList.add('visible');
+    });
+  }, 1500);
 
   // ── Canvas background (stars + subtle gradient) ──
   const canvas = document.getElementById('scene-canvas');
