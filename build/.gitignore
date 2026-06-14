@@ -1,0 +1,7 @@
+node_modules/
+package-lock.json
+# Local-only render tooling / artifacts (not part of the site)
+chrome.zip
+chrome-linux64/
+*.png
+shot*.js
