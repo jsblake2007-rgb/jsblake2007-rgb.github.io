@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>JVDE — Web & App Development Studio | Pretoria, South Africa</title>
-  <meta name="description" content="JVDE builds websites, web apps, mobile apps and AI features for South African businesses. Tell us what you need and get a quote — fast." />
-  <meta name="theme-color" content="#6d28d9" />
+  <meta name="description" content="JVDE builds high-end websites, web apps, mobile apps and AI features for South African businesses. Tell us what you need and get a quote — fast." />
+  <meta name="theme-color" content="#0a0612" />
   <link rel="canonical" href="https://jsblake2007-rgb.github.io/jvde/" />
 
   <!-- Open Graph / WhatsApp / social share preview.
@@ -23,20 +23,19 @@
 
   <!--
     ============================================================
-    JVDE — single-file, self-contained, previewable React app.
-    Built with React 18 + Tailwind (Play CDN) + Babel (in-browser JSX).
-    Icons are small inline SVG components in the style of lucide-react,
-    so nothing needs bundling — just open this file in a browser.
+    JVDE — single, self-contained, dependency-free React app.
+    React + ReactDOM + Babel are vendored in ./vendor (no CDN).
+    Tailwind is precompiled to ./styles.css (regenerate from /build).
 
     👉 THINGS TO PLUG IN (search for "REPLACE:"):
        1. WHATSAPP_NUMBER  — your WhatsApp number in full intl format.
        2. FORM_ENDPOINT    — your Cloudflare Worker / form endpoint URL.
-       3. Footer contact + social links.
+       3. STATS / PORTFOLIO / TESTIMONIALS — swap placeholders for real ones.
+       4. Footer contact + social links.
     ============================================================
   -->
 
-  <!-- Tailwind: precompiled, static stylesheet (no runtime, works offline).
-       Regenerate after editing classes:  see /build/ in the repo. -->
+  <!-- Tailwind: precompiled static stylesheet (no runtime, works offline). -->
   <link rel="stylesheet" href="./styles.css" />
 
   <!-- Web font (degrades gracefully to the system sans stack if offline). -->
@@ -51,35 +50,70 @@
 
   <style>
     html { scroll-behavior: smooth; }
-    body { background: #fbf7f2; }
-    /* Subtle sunset gradient text helper */
+    body {
+      background:
+        radial-gradient(1200px 600px at 80% -10%, rgba(124,58,237,0.20), transparent 60%),
+        radial-gradient(900px 500px at 10% 10%, rgba(251,113,133,0.12), transparent 55%),
+        #0a0612;
+      color: #f5f3ff;
+    }
+    /* Sunset gradient text + fills */
     .sunset-text {
-      background: linear-gradient(90deg, #6d28d9 0%, #fb7185 55%, #f97316 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
+      background: linear-gradient(90deg, #a78bfa 0%, #fb7185 55%, #f97316 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
     }
     .sunset-bg {
-      background: linear-gradient(120deg, #6d28d9 0%, #9333ea 40%, #fb7185 75%, #f97316 100%);
+      background: linear-gradient(120deg, #7c3aed 0%, #9333ea 38%, #fb7185 74%, #f97316 100%);
     }
-    /* River: continuous "current" flow along the path */
+    /* Glassy panels */
+    .glass {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      backdrop-filter: blur(10px);
+    }
+    .glass-strong {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(14px);
+    }
+    /* Animated gradient border helper for the featured pricing card */
+    .grad-border { position: relative; }
+    .grad-border::before {
+      content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px;
+      background: linear-gradient(120deg, #7c3aed, #fb7185, #f97316, #7c3aed);
+      background-size: 200% 200%; animation: gradient 6s ease infinite;
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
+    }
+    /* Shimmer sweep on primary buttons */
+    .shine { position: relative; overflow: hidden; }
+    .shine::after {
+      content: ""; position: absolute; top: 0; left: -120%; width: 60%; height: 100%;
+      background: linear-gradient(100deg, transparent, rgba(255,255,255,0.35), transparent);
+      transform: skewX(-18deg); transition: left .6s ease;
+    }
+    .shine:hover::after { left: 130%; }
+    /* River current + ripples */
     @keyframes riverflow { to { stroke-dashoffset: -24; } }
-    /* Water ripples that spawn on tap/click */
     @keyframes ripple { to { transform: scale(9); opacity: 0; } }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-track { background: #0a0612; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(#7c3aed,#fb7185); border-radius: 9px; }
     @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
       .river-flow { animation: none !important; }
     }
   </style>
 </head>
 <body>
   <div id="root">
-    <!-- Replaced by React once it mounts. Shown briefly while scripts load. -->
-    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:Inter,system-ui,sans-serif;color:#6d28d9;font-weight:700">
+    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:Inter,system-ui,sans-serif;color:#a78bfa;font-weight:700">
       Loading JVDE…
     </div>
   </div>
   <noscript>
-    <div style="max-width:40rem;margin:4rem auto;padding:0 1.25rem;font-family:system-ui,sans-serif;color:#1c1530;text-align:center">
+    <div style="max-width:40rem;margin:4rem auto;padding:0 1.25rem;font-family:system-ui,sans-serif;color:#f5f3ff;text-align:center">
       <h1>JVDE — Web &amp; App Development Studio</h1>
       <p>This site needs JavaScript enabled. Please turn it on, or reach us on WhatsApp.</p>
     </div>
@@ -99,10 +133,7 @@
     // REPLACE: your Cloudflare Worker / form endpoint that accepts a JSON POST.
     const FORM_ENDPOINT = "/api/submit-request";
 
-    /* ---------------------------------------------------------
-       SERVICES — edit this list freely. Each needs:
-       id, title, description, and an icon name (see Icon component).
-       --------------------------------------------------------- */
+    /* SERVICES — edit freely. id, title, desc, icon. */
     const SERVICES = [
       { id: "website",   title: "Website design / redesign", desc: "A sharp, modern site that loads fast and wins trust.", icon: "layout" },
       { id: "webapp",    title: "Web application",           desc: "Dashboards, portals and tools that do real work.",   icon: "code" },
@@ -117,12 +148,31 @@
     const BUDGETS   = ["Under R5k", "R5–15k", "R15–40k", "R40k+"];
     const TIMELINES = ["ASAP", "~1 month", "2–3 months", "Flexible"];
     const CONTACT_METHODS = ["WhatsApp", "Email", "Call"];
-
     const STEPS = ["Services", "Project", "Your details", "Review"];
 
-    /* ---------------------------------------------------------
-       HOW IT WORKS — edit freely.
-       --------------------------------------------------------- */
+    /* HERO rotating words */
+    const HERO_WORDS = ["works", "ships fast", "scales", "converts", "wins clients"];
+
+    /* STATS band — REPLACE with your real numbers. */
+    const STATS = [
+      { value: 30,  suffix: "+",     label: "Projects shipped" },
+      { value: 14,  suffix: " days", label: "Avg. turnaround" },
+      { value: 100, suffix: "%",     label: "Happy clients" },
+      { value: 5,   suffix: "★",     label: "Average rating" },
+    ];
+
+    /* TECH marquee — honest, modern stack. */
+    const TECH = ["React", "Tailwind CSS", "Node.js", "TypeScript", "Cloudflare", "AI / LLMs", "iOS", "Android", "Figma", "Stripe / Payfast", "Supabase", "Vite"];
+
+    /* PORTFOLIO / work — REPLACE with real projects + screenshots. */
+    const PORTFOLIO = [
+      { title: "Coffee Co. Online Store", tag: "E-commerce", blurb: "A clean store with local delivery and Payfast checkout.", from: "#7c3aed", to: "#fb7185" },
+      { title: "Trades Booking Portal",   tag: "Web app",    blurb: "Lead capture, quotes and scheduling in one dashboard.", from: "#9333ea", to: "#f97316" },
+      { title: "Fitness Coach App",       tag: "Mobile app", blurb: "iOS & Android app with plans, tracking and reminders.", from: "#fb7185", to: "#f59e0b" },
+      { title: "Law Firm Website",        tag: "Website",    blurb: "A confident brand site that books more consultations.", from: "#6d28d9", to: "#fb7185" },
+    ];
+
+    /* PROCESS */
     const PROCESS = [
       { icon: "whatsapp", title: "Chat",   desc: "Send your request — we reply fast on WhatsApp." },
       { icon: "edit",     title: "Quote",  desc: "A clear, no-jargon quote and timeline." },
@@ -130,37 +180,32 @@
       { icon: "rocket",   title: "Launch", desc: "We ship it live and keep it running smoothly." },
     ];
 
-    /* ---------------------------------------------------------
-       PRICING / PACKAGES — edit prices & features freely.
-       These are starting guides; the builder still sends a custom request.
-       --------------------------------------------------------- */
+    /* PRICING */
     const PACKAGES = [
-      {
-        name: "Starter",
-        price: "From R6k",
-        tagline: "A sharp single-page site to get you online.",
-        features: ["1-page modern site", "Mobile-first design", "Contact / WhatsApp button", "Basic SEO setup", "2 rounds of changes"],
-        featured: false,
-      },
-      {
-        name: "Standard",
-        price: "From R18k",
-        tagline: "A full site or web app built around your business.",
-        features: ["Multi-page site or web app", "Custom design & branding", "Lead / enquiry forms", "AI feature or automation", "Performance & SEO", "3 rounds of changes"],
-        featured: true,
-      },
-      {
-        name: "Custom",
-        price: "Let's talk",
-        tagline: "Bigger builds — mobile apps, e-commerce, the works.",
-        features: ["Mobile app (iOS & Android)", "E-commerce / online store", "Advanced AI integration", "Ongoing support retainer", "Scoped to exactly your needs"],
-        featured: false,
-      },
+      { name: "Starter",  price: "From R6k",   tagline: "A sharp single-page site to get you online.",
+        features: ["1-page modern site", "Mobile-first design", "Contact / WhatsApp button", "Basic SEO setup", "2 rounds of changes"], featured: false },
+      { name: "Standard", price: "From R18k",  tagline: "A full site or web app built around your business.",
+        features: ["Multi-page site or web app", "Custom design & branding", "Lead / enquiry forms", "An AI feature or automation", "Performance & SEO", "3 rounds of changes"], featured: true },
+      { name: "Custom",   price: "Let's talk", tagline: "Bigger builds — mobile apps, e-commerce, the works.",
+        features: ["Mobile app (iOS & Android)", "E-commerce / online store", "Advanced AI integration", "Ongoing support retainer", "Scoped to exactly your needs"], featured: false },
     ];
 
-    /* ---------------------------------------------------------
-       FAQ — edit freely.
-       --------------------------------------------------------- */
+    /* GUARANTEES / trust */
+    const GUARANTEES = [
+      { icon: "rocket", title: "Ship in weeks, not months", desc: "Clear timelines, agreed upfront. We move fast and keep you posted." },
+      { icon: "shield", title: "You own everything",        desc: "Code, content and accounts are yours once paid. No lock-in." },
+      { icon: "sparkles", title: "AI built in",             desc: "Smart features and automation that genuinely save you time." },
+      { icon: "phone",  title: "Local & reachable",          desc: "Pretoria-based, on your timezone, quick to reply on WhatsApp." },
+    ];
+
+    /* TESTIMONIALS — REPLACE with real quotes. */
+    const TESTIMONIALS = [
+      { quote: "JVDE took our idea and had a working site live in under two weeks. Fast, easy to deal with, and it just works.", name: "A happy first client", role: "Small business owner, Pretoria" },
+      { quote: "The booking system they built saves me hours every week. Enquiries now land straight on my phone.", name: "Service business owner", role: "Centurion" },
+      { quote: "Clean design, no jargon, and they actually explained things. The AI chatbot answers half my customers for me.", name: "Online store owner", role: "Gauteng" },
+    ];
+
+    /* FAQ */
     const FAQS = [
       { q: "How long does it take?", a: "Most sites ship in 1–3 weeks depending on scope. We agree a timeline upfront and keep you posted — no months of silence." },
       { q: "Do I own the code and the site?", a: "Yes. Once it's paid up, it's yours — code, content and accounts. No lock-in." },
@@ -174,15 +219,7 @@
        ICONS — minimal lucide-style inline SVGs (self-contained)
        ========================================================= */
     function Icon({ name, className = "w-6 h-6", stroke = 2 }) {
-      const common = {
-        className,
-        viewBox: "0 0 24 24",
-        fill: "none",
-        stroke: "currentColor",
-        strokeWidth: stroke,
-        strokeLinecap: "round",
-        strokeLinejoin: "round",
-      };
+      const common = { className, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: stroke, strokeLinecap: "round", strokeLinejoin: "round" };
       const paths = {
         layout: <><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></>,
         code: <><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></>,
@@ -195,6 +232,7 @@
         check: <><path d="M20 6 9 17l-5-5"/></>,
         arrowRight: <><path d="M5 12h14M13 6l6 6-6 6"/></>,
         arrowLeft: <><path d="M19 12H5M11 18l-6-6 6-6"/></>,
+        arrowUpRight: <><path d="M7 17 17 7M8 7h9v9"/></>,
         whatsapp: <><path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.5L3 21l2.1-5.3A8.5 8.5 0 1 1 21 11.5z"/><path d="M8.5 9.5c0 3 2 5 5 5.5"/></>,
         zap: <><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></>,
         rocket: <><path d="M4.5 16.5c-1.5 1.3-2 5-2 5s3.7-.5 5-2c.7-.8.7-2 0-2.8a2 2 0 0 0-3 0z"/><path d="M12 15 9 12a13 13 0 0 1 8-8c2 0 3 1 3 3a13 13 0 0 1-8 8z"/><path d="M9 12H5s.5-2.8 2-4c1.7-1.4 5-1 5-1M12 15v4s2.8-.5 4-2c1.4-1.7 1-5 1-5"/></>,
@@ -204,17 +242,212 @@
         edit: <><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></>,
         menu: <><path d="M4 6h16M4 12h16M4 18h16"/></>,
         x: <><path d="M18 6 6 18M6 6l12 12"/></>,
+        star: <><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 18.9 6.1 22l1.2-6.5L2.5 9.4l6.6-.9z" fill="currentColor" stroke="none"/></>,
+        quote: <><path d="M7 7c-2.2 0-4 1.8-4 4v6h6v-6H5c0-1.1.9-2 2-2zM18 7c-2.2 0-4 1.8-4 4v6h6v-6h-4c0-1.1.9-2 2-2z" fill="currentColor" stroke="none"/></>,
+        shield: <><path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5z"/><path d="m9 12 2 2 4-4"/></>,
+        clock: <><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></>,
       };
       return <svg {...common}>{paths[name] || null}</svg>;
     }
 
     /* =========================================================
-       Small helpers
+       Helpers
        ========================================================= */
     function classNames(...xs) { return xs.filter(Boolean).join(" "); }
-
     const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
     const isPhone = (v) => v.replace(/[^\d]/g, "").length >= 7;
+    const easeOut = (t) => 1 - Math.pow(1 - t, 3);
+
+    /* Reveal on scroll — fades + lifts children into view. */
+    function Reveal({ children, className = "", delay = 0, y = 28 }) {
+      const ref = useRef(null);
+      const [shown, setShown] = useState(false);
+      useEffect(() => {
+        const el = ref.current;
+        if (!el || typeof IntersectionObserver === "undefined") { setShown(true); return; }
+        const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setShown(true); io.disconnect(); } }, { threshold: 0.12 });
+        io.observe(el);
+        return () => io.disconnect();
+      }, []);
+      return (
+        <div ref={ref} className={className} style={{
+          opacity: shown ? 1 : 0,
+          transform: shown ? "none" : `translateY(${y}px)`,
+          transition: "opacity .7s ease, transform .8s cubic-bezier(.2,.7,.2,1)",
+          transitionDelay: `${delay}ms`,
+        }}>{children}</div>
+      );
+    }
+
+    /* Count-up number that runs once it scrolls into view. */
+    function CountUp({ value, suffix = "" }) {
+      const ref = useRef(null);
+      const [n, setN] = useState(0);
+      useEffect(() => {
+        const el = ref.current;
+        if (!el || typeof IntersectionObserver === "undefined") { setN(value); return; }
+        const io = new IntersectionObserver(([e]) => {
+          if (!e.isIntersecting) return;
+          io.disconnect();
+          const dur = 1500, start = performance.now();
+          let raf;
+          const tick = (t) => {
+            const p = Math.min(1, (t - start) / dur);
+            setN(Math.round(easeOut(p) * value));
+            if (p < 1) raf = requestAnimationFrame(tick);
+          };
+          raf = requestAnimationFrame(tick);
+        }, { threshold: 0.4 });
+        io.observe(el);
+        return () => io.disconnect();
+      }, [value]);
+      return <span ref={ref}>{n}{suffix}</span>;
+    }
+
+    /* =========================================================
+       Background: animated aurora blobs + the scroll river
+       ========================================================= */
+    function Aurora() {
+      return (
+        <div aria-hidden="true" className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+          <div className="absolute -top-40 -right-32 w-[36rem] h-[36rem] rounded-full bg-plum/30 blur-3xl animate-aurora" />
+          <div className="absolute top-1/3 -left-40 w-[30rem] h-[30rem] rounded-full bg-coral/20 blur-3xl animate-float-slow" />
+          <div className="absolute bottom-0 right-1/4 w-[28rem] h-[28rem] rounded-full bg-ember/20 blur-3xl animate-aurora" style={{ animationDelay: "4s" }} />
+        </div>
+      );
+    }
+
+    function River() {
+      const [dims, setDims] = useState({ w: typeof window !== "undefined" ? window.innerWidth : 1200, h: typeof window !== "undefined" ? window.innerHeight : 800 });
+      const [swayX, setSwayX] = useState(0);
+      const baseRef = useRef(null), tideRef = useRef(null), boatRef = useRef(null), lenRef = useRef(0), rafRef = useRef(0);
+      const { w, h } = dims;
+      const d =
+        `M ${w * 0.30} ${-40} ` +
+        `C ${w * 0.02} ${h * 0.16}, ${w * 0.66} ${h * 0.30}, ${w * 0.38} ${h * 0.48} ` +
+        `S ${w * 0.06} ${h * 0.74}, ${w * 0.56} ${h * 0.90} ` +
+        `S ${w * 0.88} ${h * 1.06}, ${w * 0.64} ${h + 60}`;
+
+      const update = () => {
+        const path = baseRef.current;
+        if (!path || typeof path.getPointAtLength !== "function") return;
+        const len = lenRef.current || 1;
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+        if (tideRef.current) tideRef.current.style.strokeDashoffset = String(len * (1 - p));
+        if (boatRef.current) {
+          const pt = path.getPointAtLength(len * p);
+          const pt2 = path.getPointAtLength(Math.min(len, len * p + 1));
+          const ang = Math.atan2(pt2.y - pt.y, pt2.x - pt.x) * 180 / Math.PI;
+          boatRef.current.setAttribute("transform", `translate(${pt.x} ${pt.y}) rotate(${ang})`);
+        }
+      };
+
+      useEffect(() => {
+        const path = baseRef.current;
+        if (!path || typeof path.getTotalLength !== "function") return;
+        const len = path.getTotalLength();
+        lenRef.current = len;
+        if (tideRef.current) { tideRef.current.style.strokeDasharray = String(len); tideRef.current.style.strokeDashoffset = String(len); }
+        update();
+      }, [d]);
+
+      useEffect(() => {
+        const onScroll = () => { if (rafRef.current) return; rafRef.current = requestAnimationFrame(() => { rafRef.current = 0; update(); }); };
+        window.addEventListener("scroll", onScroll, { passive: true });
+        return () => window.removeEventListener("scroll", onScroll);
+      }, []);
+      useEffect(() => {
+        const onResize = () => setDims({ w: window.innerWidth, h: window.innerHeight });
+        window.addEventListener("resize", onResize);
+        return () => window.removeEventListener("resize", onResize);
+      }, []);
+      useEffect(() => {
+        const onMove = (e) => setSwayX((e.clientX / window.innerWidth - 0.5) * 26);
+        window.addEventListener("mousemove", onMove, { passive: true });
+        return () => window.removeEventListener("mousemove", onMove);
+      }, []);
+
+      return (
+        <div aria-hidden="true" className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+          <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="w-full h-full" style={{ transform: `translateX(${swayX}px)`, transition: "transform .5s ease-out" }}>
+            <defs>
+              <linearGradient id="riverGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#a78bfa" /><stop offset="55%" stopColor="#fb7185" /><stop offset="100%" stopColor="#f97316" />
+              </linearGradient>
+              <filter id="riverGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="7" /></filter>
+            </defs>
+            <path d={d} fill="none" stroke="url(#riverGrad)" strokeWidth="40" strokeLinecap="round" opacity="0.12" filter="url(#riverGlow)" />
+            <path ref={baseRef} d={d} fill="none" stroke="url(#riverGrad)" strokeWidth="16" strokeLinecap="round" opacity="0.30" />
+            <path ref={tideRef} d={d} fill="none" stroke="url(#riverGrad)" strokeWidth="16" strokeLinecap="round" opacity="0.95" filter="url(#riverGlow)" />
+            <path className="river-flow" d={d} fill="none" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" opacity="0.30" style={{ strokeDasharray: "2 22", animation: "riverflow 1.4s linear infinite" }} />
+            <g ref={boatRef}>
+              <circle r="12" fill="#ffffff" opacity="0.14" />
+              <path d="M -7 1 L 7 1 L 4.5 5.5 L -4.5 5.5 Z" fill="#ffffff" />
+              <path d="M 0 -11 L 0 1 L 7 -3 Z" fill="#f97316" />
+            </g>
+          </svg>
+        </div>
+      );
+    }
+
+    function Ripples() {
+      const [ripples, setRipples] = useState([]);
+      const idRef = useRef(0);
+      useEffect(() => {
+        const onClick = (e) => {
+          const id = ++idRef.current;
+          setRipples(r => [...r, { id, x: e.clientX, y: e.clientY }]);
+          setTimeout(() => setRipples(r => r.filter(p => p.id !== id)), 900);
+        };
+        window.addEventListener("click", onClick);
+        return () => window.removeEventListener("click", onClick);
+      }, []);
+      return (
+        <div aria-hidden="true" className="fixed inset-0 z-50 pointer-events-none overflow-hidden">
+          {ripples.map(r => (
+            <span key={r.id} className="absolute rounded-full" style={{ left: r.x, top: r.y, width: 16, height: 16, marginLeft: -8, marginTop: -8, border: "2px solid rgba(167,139,250,0.6)", animation: "ripple .9s ease-out forwards" }} />
+          ))}
+        </div>
+      );
+    }
+
+    /* Thin top progress bar tied to scroll. */
+    function ScrollProgress() {
+      const [p, setP] = useState(0);
+      useEffect(() => {
+        const on = () => { const m = document.documentElement.scrollHeight - window.innerHeight; setP(m > 0 ? window.scrollY / m : 0); };
+        window.addEventListener("scroll", on, { passive: true }); on();
+        return () => window.removeEventListener("scroll", on);
+      }, []);
+      return (
+        <div className="fixed top-0 left-0 right-0 h-1 z-[60] pointer-events-none">
+          <div className="h-full sunset-bg" style={{ width: `${p * 100}%` }} />
+        </div>
+      );
+    }
+
+    /* Floating WhatsApp button (appears after a bit of scrolling). */
+    function WhatsAppFab() {
+      const [show, setShow] = useState(false);
+      useEffect(() => {
+        const on = () => setShow(window.scrollY > 500);
+        window.addEventListener("scroll", on, { passive: true }); on();
+        return () => window.removeEventListener("scroll", on);
+      }, []);
+      const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi JVDE 👋 I'd like to chat about a project.")}`;
+      return (
+        <a href={url} target="_blank" rel="noopener noreferrer"
+           className={classNames("fixed bottom-5 right-5 z-50 inline-flex items-center gap-2 font-semibold text-white pl-4 pr-5 py-3 rounded-full sunset-bg shadow-lift transition-all duration-300",
+             show ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6 pointer-events-none")}>
+          <span className="relative flex w-5 h-5 items-center justify-center">
+            <span className="absolute inline-flex w-5 h-5 rounded-full bg-white/40 animate-pulse-ring" />
+            <Icon name="whatsapp" className="w-5 h-5" />
+          </span>
+          <span className="hidden sm:inline">Chat on WhatsApp</span>
+        </a>
+      );
+    }
 
     /* =========================================================
        NAVBAR
@@ -223,37 +456,27 @@
       const [open, setOpen] = useState(false);
       const links = [
         { href: "#services", label: "Services" },
+        { href: "#work", label: "Work" },
         { href: "#pricing", label: "Pricing" },
         { href: "#faq", label: "FAQ" },
-        { href: "#builder", label: "Get a quote" },
       ];
       return (
-        <header className="sticky top-0 z-40 backdrop-blur bg-sand/80 border-b border-black/5">
+        <header className="sticky top-0 z-40 backdrop-blur-xl bg-night/70 border-b border-white/5">
           <nav className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
-            <a href="#top" className="flex items-center gap-2 font-extrabold text-xl text-ink">
-              <span className="w-8 h-8 rounded-lg sunset-bg inline-flex items-center justify-center text-white text-sm font-black">J</span>
+            <a href="#top" className="flex items-center gap-2 font-extrabold text-xl text-white">
+              <span className="w-9 h-9 rounded-xl sunset-bg inline-flex items-center justify-center text-white text-sm font-black shadow-glow">J</span>
               JVDE
             </a>
             <div className="hidden md:flex items-center gap-8">
-              {links.map(l => (
-                <a key={l.href} href={l.href} className="text-sm font-medium text-ink/70 hover:text-ink transition-colors">{l.label}</a>
-              ))}
-              <button onClick={onStart} className="text-sm font-semibold text-white px-4 py-2 rounded-full sunset-bg shadow-soft hover:shadow-lift transition-shadow">
-                Start a project
-              </button>
+              {links.map(l => <a key={l.href} href={l.href} className="text-sm font-medium text-white/65 hover:text-white transition-colors">{l.label}</a>)}
+              <button onClick={onStart} className="shine text-sm font-semibold text-white px-5 py-2.5 rounded-full sunset-bg shadow-soft hover:shadow-lift transition-shadow">Start a project</button>
             </div>
-            <button className="md:hidden text-ink p-2" onClick={() => setOpen(!open)} aria-label="Menu">
-              <Icon name={open ? "x" : "menu"} />
-            </button>
+            <button className="md:hidden text-white p-2" onClick={() => setOpen(!open)} aria-label="Menu"><Icon name={open ? "x" : "menu"} /></button>
           </nav>
           {open && (
-            <div className="md:hidden px-5 pb-4 flex flex-col gap-3 border-t border-black/5 bg-sand">
-              {links.map(l => (
-                <a key={l.href} href={l.href} onClick={() => setOpen(false)} className="text-sm font-medium text-ink/80 py-1">{l.label}</a>
-              ))}
-              <button onClick={() => { setOpen(false); onStart(); }} className="text-sm font-semibold text-white px-4 py-2.5 rounded-full sunset-bg text-center">
-                Start a project
-              </button>
+            <div className="md:hidden px-5 pb-4 flex flex-col gap-3 border-t border-white/5 bg-night/95">
+              {links.map(l => <a key={l.href} href={l.href} onClick={() => setOpen(false)} className="text-sm font-medium text-white/80 py-1">{l.label}</a>)}
+              <button onClick={() => { setOpen(false); onStart(); }} className="text-sm font-semibold text-white px-4 py-2.5 rounded-full sunset-bg text-center">Start a project</button>
             </div>
           )}
         </header>
@@ -264,36 +487,92 @@
        HERO
        ========================================================= */
     function Hero({ onStart }) {
+      const [wi, setWi] = useState(0);
+      useEffect(() => {
+        const t = setInterval(() => setWi(i => (i + 1) % HERO_WORDS.length), 2200);
+        return () => clearInterval(t);
+      }, []);
       return (
         <section id="top" className="relative overflow-hidden">
-          {/* soft sunset glow */}
-          <div className="absolute -top-40 -right-40 w-[34rem] h-[34rem] rounded-full sunset-bg opacity-20 blur-3xl" />
-          <div className="absolute -bottom-40 -left-40 w-[28rem] h-[28rem] rounded-full bg-plum opacity-10 blur-3xl" />
-          <div className="relative max-w-6xl mx-auto px-5 pt-16 pb-20 md:pt-24 md:pb-28">
-            <div className="max-w-3xl animate-fade-up">
-              <span className="inline-flex items-center gap-2 text-xs font-semibold tracking-wide uppercase text-plum bg-plum/10 px-3 py-1.5 rounded-full">
-                <Icon name="map" className="w-4 h-4" /> Pretoria · South Africa
-              </span>
-              <h1 className="mt-6 text-4xl sm:text-5xl md:text-6xl font-black leading-[1.05] text-ink">
-                A site or app that <span className="sunset-text">works</span> — and ships fast.
-              </h1>
-              <p className="mt-6 text-lg md:text-xl text-ink/70 max-w-2xl">
-                JVDE designs and builds websites, web apps, mobile apps and AI features for South African businesses. Tell us what you need — we'll handle the rest.
-              </p>
-              <div className="mt-8 flex flex-col sm:flex-row gap-3">
-                <button onClick={onStart} className="inline-flex items-center justify-center gap-2 text-base font-semibold text-white px-7 py-3.5 rounded-full sunset-bg shadow-lift hover:scale-[1.02] active:scale-100 transition-transform">
-                  Build your project <Icon name="arrowRight" className="w-5 h-5" />
-                </button>
-                <a href="#services" className="inline-flex items-center justify-center gap-2 text-base font-semibold text-ink px-7 py-3.5 rounded-full bg-white border border-black/10 hover:border-plum/40 transition-colors">
-                  See what we do
-                </a>
-              </div>
-              <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-ink/60">
-                <span className="inline-flex items-center gap-1.5"><Icon name="check" className="w-4 h-4 text-ember" /> Fast turnaround</span>
-                <span className="inline-flex items-center gap-1.5"><Icon name="check" className="w-4 h-4 text-ember" /> Modern stack</span>
-                <span className="inline-flex items-center gap-1.5"><Icon name="check" className="w-4 h-4 text-ember" /> Local & responsive</span>
-              </div>
+          <div className="relative max-w-6xl mx-auto px-5 pt-16 pb-16 md:pt-24 md:pb-24">
+            <div className="max-w-3xl">
+              <Reveal>
+                <span className="inline-flex items-center gap-2 text-xs font-semibold tracking-wide uppercase text-white/80 glass px-3 py-1.5 rounded-full">
+                  <Icon name="map" className="w-4 h-4 text-coral" /> Pretoria · South Africa
+                </span>
+              </Reveal>
+              <Reveal delay={80}>
+                <h1 className="mt-6 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[1.04] text-white">
+                  A site or app that<br className="hidden sm:block" />{" "}
+                  <span key={wi} className="sunset-text inline-block animate-fade-up">{HERO_WORDS[wi]}</span>
+                  <span className="text-white"> — built to last.</span>
+                </h1>
+              </Reveal>
+              <Reveal delay={160}>
+                <p className="mt-6 text-lg md:text-xl text-white/65 max-w-2xl">
+                  JVDE designs and builds high-end websites, web apps, mobile apps and AI features for South African businesses. Tell us what you need — we'll handle the rest.
+                </p>
+              </Reveal>
+              <Reveal delay={240}>
+                <div className="mt-8 flex flex-col sm:flex-row gap-3">
+                  <button onClick={onStart} className="shine inline-flex items-center justify-center gap-2 text-base font-semibold text-white px-7 py-3.5 rounded-full sunset-bg shadow-lift hover:scale-[1.02] active:scale-100 transition-transform">
+                    Build your project <Icon name="arrowRight" className="w-5 h-5" />
+                  </button>
+                  <a href="#work" className="inline-flex items-center justify-center gap-2 text-base font-semibold text-white px-7 py-3.5 rounded-full glass-strong hover:border-plum/50 transition-colors">
+                    See our work
+                  </a>
+                </div>
+              </Reveal>
+              <Reveal delay={320}>
+                <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-white/55">
+                  <span className="inline-flex items-center gap-1.5"><Icon name="check" className="w-4 h-4 text-ember" /> Fast turnaround</span>
+                  <span className="inline-flex items-center gap-1.5"><Icon name="check" className="w-4 h-4 text-ember" /> Modern stack</span>
+                  <span className="inline-flex items-center gap-1.5"><Icon name="check" className="w-4 h-4 text-ember" /> AI-savvy</span>
+                  <span className="inline-flex items-center gap-1.5"><Icon name="check" className="w-4 h-4 text-ember" /> Local & responsive</span>
+                </div>
+              </Reveal>
             </div>
+          </div>
+        </section>
+      );
+    }
+
+    /* =========================================================
+       TECH MARQUEE
+       ========================================================= */
+    function Marquee() {
+      const row = [...TECH, ...TECH];
+      return (
+        <section className="py-8 border-y border-white/5 overflow-hidden">
+          <p className="text-center text-xs font-semibold uppercase tracking-widest text-white/40 mb-5">Built with a modern, battle-tested stack</p>
+          <div className="relative">
+            <div className="flex gap-4 w-max animate-marquee">
+              {row.map((t, i) => (
+                <span key={i} className="inline-flex items-center gap-2 text-sm font-semibold text-white/70 glass px-4 py-2 rounded-full whitespace-nowrap">
+                  <span className="w-1.5 h-1.5 rounded-full sunset-bg" /> {t}
+                </span>
+              ))}
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    /* =========================================================
+       STATS BAND
+       ========================================================= */
+    function Stats() {
+      return (
+        <section className="max-w-6xl mx-auto px-5 py-12 md:py-16">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {STATS.map((s, i) => (
+              <Reveal key={s.label} delay={i * 80}>
+                <div className="glass rounded-2xl p-6 text-center">
+                  <div className="text-3xl md:text-4xl font-black sunset-text"><CountUp value={s.value} suffix={s.suffix} /></div>
+                  <div className="mt-1 text-sm text-white/55">{s.label}</div>
+                </div>
+              </Reveal>
+            ))}
           </div>
         </section>
       );
@@ -304,88 +583,231 @@
        ========================================================= */
     function ServicesOverview({ onStart }) {
       return (
-        <section id="services" className="max-w-6xl mx-auto px-5 py-16 md:py-24">
-          <div className="max-w-2xl">
-            <h2 className="text-3xl md:text-4xl font-black text-ink">What JVDE does</h2>
-            <p className="mt-4 text-lg text-ink/70">
-              Everything you need to get online and grow — design, build, launch and keep it running. Pick the bits you need; we'll quote in plain English.
-            </p>
-          </div>
+        <section id="services" className="max-w-6xl mx-auto px-5 py-16 md:py-24 scroll-mt-20">
+          <Reveal className="max-w-2xl">
+            <h2 className="text-3xl md:text-4xl font-black text-white">What JVDE does</h2>
+            <p className="mt-4 text-lg text-white/60">Everything you need to get online and grow — design, build, launch and keep it running. Pick the bits you need; we'll quote in plain English.</p>
+          </Reveal>
           <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {SERVICES.map((s, i) => (
-              <div key={s.id} className="group bg-white rounded-2xl p-6 border border-black/5 shadow-soft hover:shadow-lift hover:-translate-y-1 transition-all"
-                   style={{ animationDelay: `${i * 40}ms` }}>
-                <div className="w-12 h-12 rounded-xl sunset-bg text-white inline-flex items-center justify-center">
-                  <Icon name={s.icon} />
+              <Reveal key={s.id} delay={(i % 4) * 60}>
+                <div className="group glass rounded-2xl p-6 h-full hover:bg-white/[0.07] hover:-translate-y-1.5 hover:shadow-lift transition-all duration-300">
+                  <div className="w-12 h-12 rounded-xl sunset-bg text-white inline-flex items-center justify-center shadow-glow group-hover:scale-110 transition-transform"><Icon name={s.icon} /></div>
+                  <h3 className="mt-4 font-bold text-white leading-snug">{s.title}</h3>
+                  <p className="mt-1.5 text-sm text-white/55">{s.desc}</p>
                 </div>
-                <h3 className="mt-4 font-bold text-ink leading-snug">{s.title}</h3>
-                <p className="mt-1.5 text-sm text-ink/60">{s.desc}</p>
-              </div>
+              </Reveal>
             ))}
           </div>
-          <div className="mt-10">
-            <button onClick={onStart} className="inline-flex items-center gap-2 font-semibold text-plum hover:gap-3 transition-all">
-              Start building your project <Icon name="arrowRight" className="w-5 h-5" />
-            </button>
+          <Reveal className="mt-10">
+            <button onClick={onStart} className="inline-flex items-center gap-2 font-semibold text-coral hover:gap-3 transition-all">Start building your project <Icon name="arrowRight" className="w-5 h-5" /></button>
+          </Reveal>
+        </section>
+      );
+    }
+
+    /* =========================================================
+       PORTFOLIO / WORK
+       ========================================================= */
+    function Work() {
+      return (
+        <section id="work" className="max-w-6xl mx-auto px-5 py-16 md:py-24 scroll-mt-20">
+          <Reveal className="max-w-2xl">
+            <span className="text-xs font-bold uppercase tracking-widest text-coral">Selected work</span>
+            <h2 className="mt-3 text-3xl md:text-4xl font-black text-white">Things we've shipped</h2>
+            <p className="mt-4 text-lg text-white/60">A taste of the kind of work we do. {/* REPLACE these with your real projects + screenshots. */}</p>
+          </Reveal>
+          <div className="mt-12 grid sm:grid-cols-2 gap-6">
+            {PORTFOLIO.map((p, i) => (
+              <Reveal key={p.title} delay={(i % 2) * 80}>
+                <a href="#builder" className="group block glass rounded-3xl overflow-hidden hover:-translate-y-1.5 hover:shadow-lift transition-all duration-300">
+                  {/* Gradient placeholder "screenshot" — swap for a real <img>. */}
+                  <div className="relative h-44 sm:h-52 overflow-hidden" style={{ background: `linear-gradient(120deg, ${p.from}, ${p.to})` }}>
+                    <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "radial-gradient(circle at 20% 30%, rgba(255,255,255,.5) 0, transparent 40%)" }} />
+                    <span className="absolute top-4 left-4 text-xs font-bold uppercase tracking-wide text-white bg-black/25 px-3 py-1 rounded-full">{p.tag}</span>
+                    <span className="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white group-hover:scale-110 transition-transform"><Icon name="arrowUpRight" className="w-5 h-5" /></span>
+                  </div>
+                  <div className="p-6">
+                    <h3 className="font-bold text-white text-lg">{p.title}</h3>
+                    <p className="mt-1.5 text-sm text-white/55">{p.blurb}</p>
+                  </div>
+                </a>
+              </Reveal>
+            ))}
           </div>
         </section>
       );
     }
 
     /* =========================================================
-       WHY JVDE
+       HOW IT WORKS
+       ========================================================= */
+    function Process() {
+      return (
+        <section className="max-w-6xl mx-auto px-5 py-12 md:py-16">
+          <Reveal>
+            <div className="glass-strong rounded-3xl p-6 sm:p-10">
+              <h2 className="text-2xl md:text-3xl font-black text-white text-center">How it works</h2>
+              <p className="mt-2 text-center text-white/55">From "hello" to live in four simple steps.</p>
+              <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                {PROCESS.map((p, i) => (
+                  <Reveal key={p.title} delay={i * 90}>
+                    <div className="text-center">
+                      <div className="w-14 h-14 mx-auto rounded-2xl sunset-bg text-white inline-flex items-center justify-center shadow-glow"><Icon name={p.icon} /></div>
+                      <div className="mt-3 text-xs font-bold tracking-wide uppercase text-coral">Step {i + 1}</div>
+                      <h3 className="mt-1 font-bold text-white">{p.title}</h3>
+                      <p className="mt-1 text-sm text-white/55">{p.desc}</p>
+                    </div>
+                  </Reveal>
+                ))}
+              </div>
+            </div>
+          </Reveal>
+        </section>
+      );
+    }
+
+    /* =========================================================
+       WHY JVDE (guarantees)
        ========================================================= */
     function WhyJVDE() {
-      const points = [
-        { icon: "rocket", title: "Fast turnaround", desc: "We move quickly and ship — no months of silence, no endless meetings." },
-        { icon: "zap", title: "Modern stack", desc: "Built on current tech that's fast, secure and easy to grow with you." },
-        { icon: "sparkles", title: "AI-savvy", desc: "We add chatbots, automation and smart features that actually save you time." },
-        { icon: "map", title: "Local & responsive", desc: "Pretoria-based, on your timezone, and quick to reply when you need us." },
-      ];
       return (
-        <section id="why" className="bg-ink text-white">
-          <div className="max-w-6xl mx-auto px-5 py-16 md:py-24">
-            <div className="max-w-2xl">
-              <h2 className="text-3xl md:text-4xl font-black">Why work with JVDE</h2>
-              <p className="mt-4 text-lg text-white/70">No jargon, no drama. Just clean work that ships and keeps working.</p>
-            </div>
-            <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {points.map(p => (
-                <div key={p.title} className="rounded-2xl p-6 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
-                  <div className="w-11 h-11 rounded-xl sunset-bg inline-flex items-center justify-center text-white">
-                    <Icon name={p.icon} className="w-5 h-5" />
-                  </div>
-                  <h3 className="mt-4 font-bold">{p.title}</h3>
-                  <p className="mt-1.5 text-sm text-white/60">{p.desc}</p>
+        <section id="why" className="max-w-6xl mx-auto px-5 py-16 md:py-24">
+          <Reveal className="max-w-2xl">
+            <h2 className="text-3xl md:text-4xl font-black text-white">Why work with JVDE</h2>
+            <p className="mt-4 text-lg text-white/60">No jargon, no drama. Just clean work that ships and keeps working.</p>
+          </Reveal>
+          <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {GUARANTEES.map((p, i) => (
+              <Reveal key={p.title} delay={(i % 4) * 70}>
+                <div className="glass rounded-2xl p-6 h-full hover:bg-white/[0.07] transition-colors">
+                  <div className="w-11 h-11 rounded-xl sunset-bg inline-flex items-center justify-center text-white shadow-glow"><Icon name={p.icon} className="w-5 h-5" /></div>
+                  <h3 className="mt-4 font-bold text-white">{p.title}</h3>
+                  <p className="mt-1.5 text-sm text-white/55">{p.desc}</p>
                 </div>
-              ))}
-            </div>
+              </Reveal>
+            ))}
           </div>
         </section>
       );
     }
 
     /* =========================================================
-       PROGRESS INDICATOR
+       PRICING
+       ========================================================= */
+    function Pricing({ onStart }) {
+      return (
+        <section id="pricing" className="max-w-6xl mx-auto px-5 py-16 md:py-24 scroll-mt-20">
+          <Reveal className="max-w-2xl mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-black text-white">Simple, honest pricing</h2>
+            <p className="mt-4 text-lg text-white/60">Starting guides, not surprises. Every project gets a clear quote upfront — pick a starting point and we'll tailor it to you.</p>
+          </Reveal>
+          <div className="mt-12 grid md:grid-cols-3 gap-5 items-start">
+            {PACKAGES.map((pkg, i) => (
+              <Reveal key={pkg.name} delay={i * 90}>
+                <div className={classNames("rounded-3xl p-7 h-full transition-all duration-300",
+                  pkg.featured ? "grad-border bg-panel shadow-lift md:-translate-y-3" : "glass hover:-translate-y-1.5 hover:shadow-lift")}>
+                  {pkg.featured && <span className="inline-block text-xs font-bold uppercase tracking-wide text-white sunset-bg px-3 py-1 rounded-full mb-3">Most popular</span>}
+                  <h3 className="text-xl font-black text-white">{pkg.name}</h3>
+                  <div className="mt-2 text-3xl font-black sunset-text">{pkg.price}</div>
+                  <p className="mt-2 text-sm text-white/55">{pkg.tagline}</p>
+                  <ul className="mt-5 space-y-2.5">
+                    {pkg.features.map(f => (
+                      <li key={f} className="flex items-start gap-2 text-sm text-white/75">
+                        <Icon name="check" className="w-4 h-4 mt-0.5 shrink-0 text-ember" stroke={3} /> {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <button onClick={onStart} className={classNames("shine mt-6 w-full inline-flex items-center justify-center gap-2 font-semibold px-5 py-3 rounded-full transition-all",
+                    pkg.featured ? "sunset-bg text-white shadow-soft hover:shadow-lift" : "glass-strong text-white hover:border-plum/50")}>
+                    Start with {pkg.name} <Icon name="arrowRight" className="w-4 h-4" />
+                  </button>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+          <p className="mt-6 text-center text-sm text-white/40">Prices in South African Rand (ZAR). Final quote depends on scope — no obligation.</p>
+        </section>
+      );
+    }
+
+    /* =========================================================
+       TESTIMONIALS
+       ========================================================= */
+    function Testimonials() {
+      return (
+        <section className="max-w-6xl mx-auto px-5 py-16 md:py-24">
+          <Reveal className="max-w-2xl mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-black text-white">What clients say</h2>
+            <p className="mt-4 text-lg text-white/60">{/* REPLACE with real testimonials once you have them. */}Real outcomes, in their words.</p>
+          </Reveal>
+          <div className="mt-12 grid md:grid-cols-3 gap-5">
+            {TESTIMONIALS.map((t, i) => (
+              <Reveal key={i} delay={i * 90}>
+                <figure className="glass rounded-3xl p-6 h-full flex flex-col">
+                  <div className="flex gap-0.5 text-amber">{[0,1,2,3,4].map(s => <Icon key={s} name="star" className="w-4 h-4" />)}</div>
+                  <blockquote className="mt-4 text-white/85 leading-relaxed flex-1">"{t.quote}"</blockquote>
+                  <figcaption className="mt-5 pt-4 border-t border-white/10">
+                    <div className="font-semibold text-white">{t.name}</div>
+                    <div className="text-sm text-white/50">{t.role}</div>
+                  </figcaption>
+                </figure>
+              </Reveal>
+            ))}
+          </div>
+        </section>
+      );
+    }
+
+    /* =========================================================
+       FAQ
+       ========================================================= */
+    function FAQ() {
+      const [open, setOpen] = useState(0);
+      return (
+        <section id="faq" className="max-w-3xl mx-auto px-5 py-16 md:py-24 scroll-mt-20">
+          <Reveal className="text-center">
+            <h2 className="text-3xl md:text-4xl font-black text-white">Questions, answered</h2>
+            <p className="mt-4 text-lg text-white/60">The stuff people usually want to know before getting started.</p>
+          </Reveal>
+          <div className="mt-10 space-y-3">
+            {FAQS.map((f, i) => {
+              const isOpen = open === i;
+              return (
+                <Reveal key={i} delay={i * 40}>
+                  <div className="glass rounded-2xl overflow-hidden">
+                    <button onClick={() => setOpen(isOpen ? -1 : i)} className="w-full flex items-center justify-between gap-4 text-left px-5 py-4">
+                      <span className="font-semibold text-white">{f.q}</span>
+                      <span className={classNames("shrink-0 text-coral transition-transform duration-300", isOpen ? "rotate-45" : "")}><Icon name="x" className="w-5 h-5" /></span>
+                    </button>
+                    {isOpen && <div className="px-5 pb-5 -mt-1 text-white/60 text-sm leading-relaxed animate-fade-up">{f.a}</div>}
+                  </div>
+                </Reveal>
+              );
+            })}
+          </div>
+        </section>
+      );
+    }
+
+    /* =========================================================
+       PROGRESS (builder steps)
        ========================================================= */
     function Progress({ step }) {
       return (
         <div className="flex items-center gap-2 sm:gap-3">
           {STEPS.map((label, i) => {
-            const done = i < step;
-            const active = i === step;
+            const done = i < step, active = i === step;
             return (
               <React.Fragment key={label}>
                 <div className="flex items-center gap-2">
-                  <div className={classNames(
-                    "w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 transition-colors",
-                    done ? "sunset-bg text-white" : active ? "bg-plum/10 text-plum ring-2 ring-plum" : "bg-black/5 text-ink/40"
-                  )}>
+                  <div className={classNames("w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 transition-colors",
+                    done ? "sunset-bg text-white" : active ? "bg-plum/20 text-white ring-2 ring-plum" : "bg-white/5 text-white/40")}>
                     {done ? <Icon name="check" className="w-4 h-4" /> : i + 1}
                   </div>
-                  <span className={classNames("text-sm font-semibold hidden md:inline", active ? "text-ink" : "text-ink/40")}>{label}</span>
+                  <span className={classNames("text-sm font-semibold hidden md:inline", active ? "text-white" : "text-white/40")}>{label}</span>
                 </div>
-                {i < STEPS.length - 1 && <div className={classNames("h-0.5 flex-1 rounded-full", done ? "sunset-bg" : "bg-black/10")} />}
+                {i < STEPS.length - 1 && <div className={classNames("h-0.5 flex-1 rounded-full", done ? "sunset-bg" : "bg-white/10")} />}
               </React.Fragment>
             );
           })}
@@ -393,71 +815,43 @@
       );
     }
 
-    /* =========================================================
-       FORM FIELD PRIMITIVES
-       ========================================================= */
     function Field({ label, error, children, hint }) {
       return (
         <label className="block">
-          <span className="text-sm font-semibold text-ink">{label}</span>
-          {hint && <span className="block text-xs text-ink/50 mt-0.5">{hint}</span>}
+          <span className="text-sm font-semibold text-white">{label}</span>
+          {hint && <span className="block text-xs text-white/45 mt-0.5">{hint}</span>}
           <div className="mt-1.5">{children}</div>
-          {error && <span className="block mt-1 text-xs font-medium text-rose-600">{error}</span>}
+          {error && <span className="block mt-1 text-xs font-medium text-rose-400">{error}</span>}
         </label>
       );
     }
-
-    const inputCls = "w-full rounded-xl border border-black/10 bg-white px-4 py-3 text-ink placeholder-ink/30 focus:outline-none focus:ring-2 focus:ring-plum/50 focus:border-plum transition";
-
+    const inputCls = "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-plum/60 focus:border-plum transition";
     function Choice({ options, value, onChange }) {
       return (
         <div className="flex flex-wrap gap-2">
           {options.map(o => (
             <button type="button" key={o} onClick={() => onChange(o)}
-              className={classNames(
-                "px-4 py-2.5 rounded-full text-sm font-semibold border transition-all",
-                value === o ? "sunset-bg text-white border-transparent shadow-soft" : "bg-white text-ink/70 border-black/10 hover:border-plum/40"
-              )}>
-              {o}
-            </button>
+              className={classNames("px-4 py-2.5 rounded-full text-sm font-semibold border transition-all",
+                value === o ? "sunset-bg text-white border-transparent shadow-soft" : "bg-white/5 text-white/70 border-white/10 hover:border-plum/50")}>{o}</button>
           ))}
         </div>
       );
     }
 
     /* =========================================================
-       THE PROJECT BUILDER
+       PROJECT BUILDER
        ========================================================= */
     function Builder({ onDone }) {
       const [step, setStep] = useState(0);
       const [submitting, setSubmitting] = useState(false);
       const topRef = useRef(null);
-
-      const [data, setData] = useState({
-        services: [],          // array of service ids
-        projectName: "",
-        description: "",
-        budget: "",
-        timeline: "",
-        name: "",
-        email: "",
-        phone: "",
-        contactMethod: "WhatsApp",
-      });
-
+      const [data, setData] = useState({ services: [], projectName: "", description: "", budget: "", timeline: "", name: "", email: "", phone: "", contactMethod: "WhatsApp" });
       const [errors, setErrors] = useState({});
 
       const update = (patch) => setData(d => ({ ...d, ...patch }));
-      const toggleService = (id) =>
-        setData(d => ({ ...d, services: d.services.includes(id) ? d.services.filter(x => x !== id) : [...d.services, id] }));
+      const toggleService = (id) => setData(d => ({ ...d, services: d.services.includes(id) ? d.services.filter(x => x !== id) : [...d.services, id] }));
+      const goto = (s) => { setStep(s); if (topRef.current) topRef.current.scrollIntoView({ behavior: "smooth", block: "start" }); };
 
-      // Scroll the builder into view when the step changes.
-      const goto = (s) => {
-        setStep(s);
-        if (topRef.current) topRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
-      };
-
-      /* ---- per-step validation ---- */
       function validateStep(s) {
         const e = {};
         if (s === 0 && data.services.length === 0) e.services = "Pick at least one service to continue.";
@@ -475,66 +869,34 @@
         setErrors(e);
         return Object.keys(e).length === 0;
       }
-
       const next = () => { if (validateStep(step)) goto(step + 1); };
       const back = () => goto(Math.max(0, step - 1));
 
-      /* ---- build the human-readable summary (also used for WhatsApp) ---- */
       function buildSummaryText() {
         const serviceTitles = data.services.map(id => SERVICES.find(s => s.id === id)?.title).filter(Boolean);
         return [
-          "🚀 *New project request — JVDE*",
-          "",
-          "*Services needed:*",
-          ...serviceTitles.map(t => `• ${t}`),
-          "",
-          `*Project / business:* ${data.projectName}`,
-          `*Description:* ${data.description}`,
-          `*Budget:* ${data.budget}`,
-          `*Timeline:* ${data.timeline}`,
-          "",
-          `*Name:* ${data.name}`,
-          `*Email:* ${data.email}`,
-          `*Phone / WhatsApp:* ${data.phone}`,
+          "🚀 *New project request — JVDE*", "", "*Services needed:*",
+          ...serviceTitles.map(t => `• ${t}`), "",
+          `*Project / business:* ${data.projectName}`, `*Description:* ${data.description}`,
+          `*Budget:* ${data.budget}`, `*Timeline:* ${data.timeline}`, "",
+          `*Name:* ${data.name}`, `*Email:* ${data.email}`, `*Phone / WhatsApp:* ${data.phone}`,
           `*Preferred contact:* ${data.contactMethod}`,
         ].join("\n");
       }
 
-      /* ---- submit: POST to endpoint (best-effort) + open WhatsApp ---- */
       async function handleSubmit() {
-        // Final guard — re-validate all gated steps.
         if (!(validateStep(0) && validateStep(1) && validateStep(2))) {
-          // jump to first invalid step
           if (data.services.length === 0) return goto(0);
           if (!data.projectName || !data.description || !data.budget || !data.timeline) return goto(1);
           return goto(2);
         }
-
         setSubmitting(true);
-
-        const payload = {
-          ...data,
-          serviceTitles: data.services.map(id => SERVICES.find(s => s.id === id)?.title).filter(Boolean),
-          submittedAt: new Date().toISOString(),
-          source: "jvde-website",
-        };
-
-        // 1) Endpoint fallback — never let a failure block the WhatsApp hand-off.
+        const payload = { ...data, serviceTitles: data.services.map(id => SERVICES.find(s => s.id === id)?.title).filter(Boolean), submittedAt: new Date().toISOString(), source: "jvde-website" };
         try {
-          await fetch(FORM_ENDPOINT, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          });
-        } catch (err) {
-          // Silently ignore — WhatsApp is the primary channel.
-          console.warn("Endpoint POST failed (WhatsApp hand-off continues):", err);
-        }
-
-        // 2) WhatsApp primary — open a pre-filled message to the studio owner.
+          await fetch(FORM_ENDPOINT, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+        } catch (err) { console.warn("Endpoint POST failed (WhatsApp hand-off continues):", err); }
         const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(buildSummaryText())}`;
         window.open(waUrl, "_blank", "noopener,noreferrer");
-
         setSubmitting(false);
         onDone(payload);
       }
@@ -544,146 +906,84 @@
       return (
         <section id="builder">
           <div ref={topRef} className="max-w-3xl mx-auto px-5 py-16 md:py-24 scroll-mt-20">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl md:text-4xl font-black text-ink">Build your project</h2>
-              <p className="mt-3 text-ink/60">Four quick steps. It lands straight in our inbox.</p>
-            </div>
-
-            <div className="bg-white rounded-3xl shadow-soft border border-black/5 p-6 sm:p-8">
+            <Reveal className="text-center mb-8">
+              <h2 className="text-3xl md:text-4xl font-black text-white">Build your project</h2>
+              <p className="mt-3 text-white/55">Four quick steps. It lands straight in our inbox.</p>
+            </Reveal>
+            <div className="glass-strong rounded-3xl p-6 sm:p-8">
               <div className="mb-8"><Progress step={step} /></div>
 
-              {/* STEP 0 — services */}
               {step === 0 && (
                 <div className="animate-fade-up">
-                  <h3 className="text-xl font-bold text-ink">What do you need?</h3>
-                  <p className="text-sm text-ink/60 mt-1">Pick everything that applies — you can choose more than one.</p>
+                  <h3 className="text-xl font-bold text-white">What do you need?</h3>
+                  <p className="text-sm text-white/55 mt-1">Pick everything that applies — you can choose more than one.</p>
                   <div className="mt-6 grid sm:grid-cols-2 gap-3">
                     {SERVICES.map(s => {
                       const on = data.services.includes(s.id);
                       return (
                         <button type="button" key={s.id} onClick={() => toggleService(s.id)}
-                          className={classNames(
-                            "text-left rounded-2xl p-4 border-2 transition-all flex gap-3 items-start",
-                            on ? "border-plum bg-plum/5 shadow-soft" : "border-black/10 bg-white hover:border-plum/40"
-                          )}>
-                          <div className={classNames("w-10 h-10 rounded-xl inline-flex items-center justify-center shrink-0", on ? "sunset-bg text-white" : "bg-black/5 text-ink/60")}>
-                            <Icon name={s.icon} className="w-5 h-5" />
-                          </div>
+                          className={classNames("text-left rounded-2xl p-4 border-2 transition-all flex gap-3 items-start",
+                            on ? "border-plum bg-plum/10 shadow-soft" : "border-white/10 bg-white/5 hover:border-plum/50")}>
+                          <div className={classNames("w-10 h-10 rounded-xl inline-flex items-center justify-center shrink-0", on ? "sunset-bg text-white" : "bg-white/10 text-white/60")}><Icon name={s.icon} className="w-5 h-5" /></div>
                           <div className="flex-1">
                             <div className="flex items-center justify-between gap-2">
-                              <span className="font-semibold text-ink text-sm leading-snug">{s.title}</span>
-                              <span className={classNames("w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0", on ? "sunset-bg border-transparent text-white" : "border-black/20")}>
-                                {on && <Icon name="check" className="w-3 h-3" stroke={3} />}
-                              </span>
+                              <span className="font-semibold text-white text-sm leading-snug">{s.title}</span>
+                              <span className={classNames("w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0", on ? "sunset-bg border-transparent text-white" : "border-white/25")}>{on && <Icon name="check" className="w-3 h-3" stroke={3} />}</span>
                             </div>
-                            <p className="text-xs text-ink/55 mt-1">{s.desc}</p>
+                            <p className="text-xs text-white/50 mt-1">{s.desc}</p>
                           </div>
                         </button>
                       );
                     })}
                   </div>
-                  {errors.services && <p className="mt-3 text-sm font-medium text-rose-600">{errors.services}</p>}
+                  {errors.services && <p className="mt-3 text-sm font-medium text-rose-400">{errors.services}</p>}
                 </div>
               )}
 
-              {/* STEP 1 — project details */}
               {step === 1 && (
                 <div className="animate-fade-up space-y-5">
-                  <h3 className="text-xl font-bold text-ink">Tell us about the project</h3>
-                  <Field label="Project / business name" error={errors.projectName}>
-                    <input className={inputCls} value={data.projectName} onChange={e => update({ projectName: e.target.value })} placeholder="e.g. Thabo's Coffee Co." />
-                  </Field>
-                  <Field label="What do you need?" hint="Describe it in plain words — features, goals, anything we should know." error={errors.description}>
-                    <textarea rows={4} className={inputCls} value={data.description} onChange={e => update({ description: e.target.value })} placeholder="We're a small coffee shop and want an online store with delivery in Pretoria..." />
-                  </Field>
-                  <Field label="Budget range" error={errors.budget}>
-                    <Choice options={BUDGETS} value={data.budget} onChange={v => update({ budget: v })} />
-                  </Field>
-                  <Field label="Desired timeline" error={errors.timeline}>
-                    <Choice options={TIMELINES} value={data.timeline} onChange={v => update({ timeline: v })} />
-                  </Field>
+                  <h3 className="text-xl font-bold text-white">Tell us about the project</h3>
+                  <Field label="Project / business name" error={errors.projectName}><input className={inputCls} value={data.projectName} onChange={e => update({ projectName: e.target.value })} placeholder="e.g. Thabo's Coffee Co." /></Field>
+                  <Field label="What do you need?" hint="Describe it in plain words — features, goals, anything we should know." error={errors.description}><textarea rows={4} className={inputCls} value={data.description} onChange={e => update({ description: e.target.value })} placeholder="We're a small coffee shop and want an online store with delivery in Pretoria..." /></Field>
+                  <Field label="Budget range" error={errors.budget}><Choice options={BUDGETS} value={data.budget} onChange={v => update({ budget: v })} /></Field>
+                  <Field label="Desired timeline" error={errors.timeline}><Choice options={TIMELINES} value={data.timeline} onChange={v => update({ timeline: v })} /></Field>
                 </div>
               )}
 
-              {/* STEP 2 — your details */}
               {step === 2 && (
                 <div className="animate-fade-up space-y-5">
-                  <h3 className="text-xl font-bold text-ink">How do we reach you?</h3>
-                  <Field label="Your name" error={errors.name}>
-                    <input className={inputCls} value={data.name} onChange={e => update({ name: e.target.value })} placeholder="Full name" />
-                  </Field>
-                  <Field label="Email" error={errors.email}>
-                    <input type="email" className={inputCls} value={data.email} onChange={e => update({ email: e.target.value })} placeholder="you@email.co.za" />
-                  </Field>
-                  <Field label="Phone / WhatsApp number" error={errors.phone}>
-                    <input type="tel" className={inputCls} value={data.phone} onChange={e => update({ phone: e.target.value })} placeholder="082 123 4567" />
-                  </Field>
-                  <Field label="Preferred contact method">
-                    <Choice options={CONTACT_METHODS} value={data.contactMethod} onChange={v => update({ contactMethod: v })} />
-                  </Field>
+                  <h3 className="text-xl font-bold text-white">How do we reach you?</h3>
+                  <Field label="Your name" error={errors.name}><input className={inputCls} value={data.name} onChange={e => update({ name: e.target.value })} placeholder="Full name" /></Field>
+                  <Field label="Email" error={errors.email}><input type="email" className={inputCls} value={data.email} onChange={e => update({ email: e.target.value })} placeholder="you@email.co.za" /></Field>
+                  <Field label="Phone / WhatsApp number" error={errors.phone}><input type="tel" className={inputCls} value={data.phone} onChange={e => update({ phone: e.target.value })} placeholder="082 123 4567" /></Field>
+                  <Field label="Preferred contact method"><Choice options={CONTACT_METHODS} value={data.contactMethod} onChange={v => update({ contactMethod: v })} /></Field>
                 </div>
               )}
 
-              {/* STEP 3 — review */}
               {step === 3 && (
                 <div className="animate-fade-up">
-                  <h3 className="text-xl font-bold text-ink">Quick review</h3>
-                  <p className="text-sm text-ink/60 mt-1">Check it over, then send. We'll be in touch fast.</p>
-
+                  <h3 className="text-xl font-bold text-white">Quick review</h3>
+                  <p className="text-sm text-white/55 mt-1">Check it over, then send. We'll be in touch fast.</p>
                   <div className="mt-6 space-y-4">
                     <ReviewBlock title="Services" onEdit={() => goto(0)}>
-                      <div className="flex flex-wrap gap-2">
-                        {selectedServices.map(s => (
-                          <span key={s.id} className="inline-flex items-center gap-1.5 text-sm font-medium text-plum bg-plum/10 px-3 py-1.5 rounded-full">
-                            <Icon name={s.icon} className="w-4 h-4" /> {s.title}
-                          </span>
-                        ))}
-                      </div>
+                      <div className="flex flex-wrap gap-2">{selectedServices.map(s => <span key={s.id} className="inline-flex items-center gap-1.5 text-sm font-medium text-white bg-plum/20 px-3 py-1.5 rounded-full"><Icon name={s.icon} className="w-4 h-4" /> {s.title}</span>)}</div>
                     </ReviewBlock>
-
                     <ReviewBlock title="Project" onEdit={() => goto(1)}>
-                      <dl className="text-sm space-y-1.5">
-                        <ReviewRow k="Name" v={data.projectName} />
-                        <ReviewRow k="Description" v={data.description} />
-                        <ReviewRow k="Budget" v={data.budget} />
-                        <ReviewRow k="Timeline" v={data.timeline} />
-                      </dl>
+                      <dl className="text-sm space-y-1.5"><ReviewRow k="Name" v={data.projectName} /><ReviewRow k="Description" v={data.description} /><ReviewRow k="Budget" v={data.budget} /><ReviewRow k="Timeline" v={data.timeline} /></dl>
                     </ReviewBlock>
-
                     <ReviewBlock title="Your details" onEdit={() => goto(2)}>
-                      <dl className="text-sm space-y-1.5">
-                        <ReviewRow k="Name" v={data.name} />
-                        <ReviewRow k="Email" v={data.email} />
-                        <ReviewRow k="Phone" v={data.phone} />
-                        <ReviewRow k="Preferred contact" v={data.contactMethod} />
-                      </dl>
+                      <dl className="text-sm space-y-1.5"><ReviewRow k="Name" v={data.name} /><ReviewRow k="Email" v={data.email} /><ReviewRow k="Phone" v={data.phone} /><ReviewRow k="Preferred contact" v={data.contactMethod} /></dl>
                     </ReviewBlock>
                   </div>
-
-                  <p className="mt-5 text-xs text-ink/50">
-                    On submit we'll open WhatsApp with your request pre-filled, and also send it to our inbox as a backup.
-                  </p>
+                  <p className="mt-5 text-xs text-white/45">On submit we'll open WhatsApp with your request pre-filled, and also send it to our inbox as a backup.</p>
                 </div>
               )}
 
-              {/* NAV BUTTONS */}
               <div className="mt-8 flex items-center justify-between gap-3">
-                {step > 0 ? (
-                  <button onClick={back} className="inline-flex items-center gap-2 font-semibold text-ink/70 hover:text-ink px-4 py-3 rounded-full transition-colors">
-                    <Icon name="arrowLeft" className="w-5 h-5" /> Back
-                  </button>
-                ) : <span />}
-
-                {step < 3 ? (
-                  <button onClick={next} className="inline-flex items-center gap-2 font-semibold text-white px-7 py-3.5 rounded-full sunset-bg shadow-soft hover:shadow-lift transition-shadow">
-                    Continue <Icon name="arrowRight" className="w-5 h-5" />
-                  </button>
-                ) : (
-                  <button onClick={handleSubmit} disabled={submitting}
-                    className="inline-flex items-center gap-2 font-semibold text-white px-7 py-3.5 rounded-full sunset-bg shadow-lift hover:scale-[1.02] active:scale-100 transition-transform disabled:opacity-60 disabled:cursor-wait">
-                    <Icon name="whatsapp" className="w-5 h-5" /> {submitting ? "Sending…" : "Send my request"}
-                  </button>
-                )}
+                {step > 0 ? <button onClick={back} className="inline-flex items-center gap-2 font-semibold text-white/70 hover:text-white px-4 py-3 rounded-full transition-colors"><Icon name="arrowLeft" className="w-5 h-5" /> Back</button> : <span />}
+                {step < 3
+                  ? <button onClick={next} className="shine inline-flex items-center gap-2 font-semibold text-white px-7 py-3.5 rounded-full sunset-bg shadow-soft hover:shadow-lift transition-shadow">Continue <Icon name="arrowRight" className="w-5 h-5" /></button>
+                  : <button onClick={handleSubmit} disabled={submitting} className="shine inline-flex items-center gap-2 font-semibold text-white px-7 py-3.5 rounded-full sunset-bg shadow-lift hover:scale-[1.02] active:scale-100 transition-transform disabled:opacity-60 disabled:cursor-wait"><Icon name="whatsapp" className="w-5 h-5" /> {submitting ? "Sending…" : "Send my request"}</button>}
               </div>
             </div>
           </div>
@@ -693,51 +993,32 @@
 
     function ReviewBlock({ title, onEdit, children }) {
       return (
-        <div className="rounded-2xl border border-black/10 p-4 bg-sand/60">
-          <div className="flex items-center justify-between">
-            <h4 className="font-bold text-ink">{title}</h4>
-            <button onClick={onEdit} className="inline-flex items-center gap-1 text-xs font-semibold text-plum hover:underline">
-              <Icon name="edit" className="w-3.5 h-3.5" /> Edit
-            </button>
-          </div>
+        <div className="rounded-2xl border border-white/10 p-4 bg-white/[0.03]">
+          <div className="flex items-center justify-between"><h4 className="font-bold text-white">{title}</h4><button onClick={onEdit} className="inline-flex items-center gap-1 text-xs font-semibold text-coral hover:underline"><Icon name="edit" className="w-3.5 h-3.5" /> Edit</button></div>
           <div className="mt-3">{children}</div>
         </div>
       );
     }
-
     function ReviewRow({ k, v }) {
-      return (
-        <div className="flex gap-2">
-          <dt className="text-ink/50 w-28 shrink-0">{k}</dt>
-          <dd className="text-ink font-medium break-words flex-1">{v || "—"}</dd>
-        </div>
-      );
+      return <div className="flex gap-2"><dt className="text-white/45 w-28 shrink-0">{k}</dt><dd className="text-white font-medium break-words flex-1">{v || "—"}</dd></div>;
     }
 
     /* =========================================================
-       CONFIRMATION SCREEN
+       CONFIRMATION
        ========================================================= */
     function Confirmation({ payload, onReset }) {
       const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi JVDE, I just sent a project request 👋")}`;
       return (
         <section>
           <div className="max-w-2xl mx-auto px-5 py-20 md:py-28 text-center animate-fade-up">
-            <div className="w-20 h-20 rounded-full sunset-bg text-white inline-flex items-center justify-center shadow-lift">
-              <Icon name="check" className="w-10 h-10" stroke={3} />
-            </div>
-            <h2 className="mt-8 text-3xl md:text-4xl font-black text-ink">Request sent — nice one, {payload?.name?.split(" ")[0] || "there"}! 🎉</h2>
-            <p className="mt-4 text-lg text-ink/70">
-              Your project request is on its way to us. If WhatsApp didn't open automatically, tap the button below to send it through.
-            </p>
+            <div className="w-20 h-20 rounded-full sunset-bg text-white inline-flex items-center justify-center shadow-lift"><Icon name="check" className="w-10 h-10" stroke={3} /></div>
+            <h2 className="mt-8 text-3xl md:text-4xl font-black text-white">Request sent — nice one, {payload?.name?.split(" ")[0] || "there"}! 🎉</h2>
+            <p className="mt-4 text-lg text-white/65">Your project request is on its way to us. If WhatsApp didn't open automatically, tap the button below to send it through.</p>
             <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-              <a href={waUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 font-semibold text-white px-7 py-3.5 rounded-full sunset-bg shadow-lift hover:scale-[1.02] transition-transform">
-                <Icon name="whatsapp" className="w-5 h-5" /> Open WhatsApp
-              </a>
-              <button onClick={onReset} className="inline-flex items-center justify-center gap-2 font-semibold text-ink px-7 py-3.5 rounded-full bg-white border border-black/10 hover:border-plum/40 transition-colors">
-                Start another request
-              </button>
+              <a href={waUrl} target="_blank" rel="noopener noreferrer" className="shine inline-flex items-center justify-center gap-2 font-semibold text-white px-7 py-3.5 rounded-full sunset-bg shadow-lift hover:scale-[1.02] transition-transform"><Icon name="whatsapp" className="w-5 h-5" /> Open WhatsApp</a>
+              <button onClick={onReset} className="inline-flex items-center justify-center gap-2 font-semibold text-white px-7 py-3.5 rounded-full glass-strong hover:border-plum/50 transition-colors">Start another request</button>
             </div>
-            <p className="mt-8 text-sm text-ink/50">We usually reply within a day. Talk soon.</p>
+            <p className="mt-8 text-sm text-white/45">We usually reply within a day. Talk soon.</p>
           </div>
         </section>
       );
@@ -748,20 +1029,15 @@
        ========================================================= */
     function Footer() {
       return (
-        <footer className="bg-ink text-white">
+        <footer className="border-t border-white/10 mt-8">
           <div className="max-w-6xl mx-auto px-5 py-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div>
-              <div className="flex items-center gap-2 font-extrabold text-xl">
-                <span className="w-8 h-8 rounded-lg sunset-bg inline-flex items-center justify-center text-white text-sm font-black">J</span>
-                JVDE
-              </div>
-              <p className="mt-3 text-sm text-white/60 max-w-xs">
-                Web & app development studio in Pretoria, South Africa. Sites and apps that work and ship fast.
-              </p>
+              <div className="flex items-center gap-2 font-extrabold text-xl text-white"><span className="w-8 h-8 rounded-lg sunset-bg inline-flex items-center justify-center text-white text-sm font-black">J</span> JVDE</div>
+              <p className="mt-3 text-sm text-white/55 max-w-xs">Web & app development studio in Pretoria, South Africa. Sites and apps that work and ship fast.</p>
             </div>
             <div>
-              <h4 className="font-bold text-sm uppercase tracking-wide text-white/50">Contact</h4>
-              <ul className="mt-3 space-y-2 text-sm text-white/80">
+              <h4 className="font-bold text-sm uppercase tracking-wide text-white/40">Contact</h4>
+              <ul className="mt-3 space-y-2 text-sm text-white/75">
                 {/* REPLACE: your real contact details */}
                 <li className="flex items-center gap-2"><Icon name="mail" className="w-4 h-4 text-ember" /> hello@jvde.co.za</li>
                 <li className="flex items-center gap-2"><Icon name="phone" className="w-4 h-4 text-ember" /> +27 00 000 0000</li>
@@ -769,8 +1045,8 @@
               </ul>
             </div>
             <div>
-              <h4 className="font-bold text-sm uppercase tracking-wide text-white/50">Follow</h4>
-              <ul className="mt-3 space-y-2 text-sm text-white/80">
+              <h4 className="font-bold text-sm uppercase tracking-wide text-white/40">Follow</h4>
+              <ul className="mt-3 space-y-2 text-sm text-white/75">
                 {/* REPLACE: your real social links */}
                 <li><a href="#" className="hover:text-white transition-colors">Instagram</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">LinkedIn</a></li>
@@ -779,7 +1055,7 @@
             </div>
           </div>
           <div className="border-t border-white/10">
-            <div className="max-w-6xl mx-auto px-5 py-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-white/50">
+            <div className="max-w-6xl mx-auto px-5 py-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-white/45">
               <span>© {new Date().getFullYear()} JVDE. All rights reserved.</span>
               <span>Made in Pretoria 🇿🇦</span>
             </div>
@@ -789,332 +1065,46 @@
     }
 
     /* =========================================================
-       HOW IT WORKS (process strip)
-       ========================================================= */
-    function Process() {
-      return (
-        <section className="max-w-6xl mx-auto px-5 py-12 md:py-16">
-          <div className="rounded-3xl bg-white border border-black/5 shadow-soft p-6 sm:p-10">
-            <h2 className="text-2xl md:text-3xl font-black text-ink text-center">How it works</h2>
-            <p className="mt-2 text-center text-ink/60">From "hello" to live in four simple steps.</p>
-            <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {PROCESS.map((p, i) => (
-                <div key={p.title} className="relative text-center">
-                  <div className="w-14 h-14 mx-auto rounded-2xl sunset-bg text-white inline-flex items-center justify-center shadow-soft">
-                    <Icon name={p.icon} />
-                  </div>
-                  <div className="mt-3 text-xs font-bold tracking-wide uppercase text-plum">Step {i + 1}</div>
-                  <h3 className="mt-1 font-bold text-ink">{p.title}</h3>
-                  <p className="mt-1 text-sm text-ink/60">{p.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      );
-    }
-
-    /* =========================================================
-       PRICING / PACKAGES
-       ========================================================= */
-    function Pricing({ onStart }) {
-      return (
-        <section id="pricing" className="max-w-6xl mx-auto px-5 py-16 md:py-24 scroll-mt-20">
-          <div className="max-w-2xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-black text-ink">Simple, honest pricing</h2>
-            <p className="mt-4 text-lg text-ink/70">
-              Starting guides, not surprises. Every project gets a clear quote upfront — pick a starting point and we'll tailor it to you.
-            </p>
-          </div>
-          <div className="mt-12 grid md:grid-cols-3 gap-5 items-start">
-            {PACKAGES.map(pkg => (
-              <div key={pkg.name}
-                className={classNames(
-                  "rounded-3xl p-7 border transition-all",
-                  pkg.featured
-                    ? "sunset-bg text-white border-transparent shadow-lift md:-translate-y-2"
-                    : "bg-white text-ink border-black/10 shadow-soft hover:-translate-y-1"
-                )}>
-                {pkg.featured && (
-                  <span className="inline-block text-xs font-bold uppercase tracking-wide bg-white/20 px-3 py-1 rounded-full mb-3">Most popular</span>
-                )}
-                <h3 className={classNames("text-xl font-black", pkg.featured ? "text-white" : "text-ink")}>{pkg.name}</h3>
-                <div className={classNames("mt-2 text-3xl font-black", pkg.featured ? "text-white" : "sunset-text")}>{pkg.price}</div>
-                <p className={classNames("mt-2 text-sm", pkg.featured ? "text-white/80" : "text-ink/60")}>{pkg.tagline}</p>
-                <ul className="mt-5 space-y-2.5">
-                  {pkg.features.map(f => (
-                    <li key={f} className={classNames("flex items-start gap-2 text-sm", pkg.featured ? "text-white/90" : "text-ink/75")}>
-                      <Icon name="check" className={classNames("w-4 h-4 mt-0.5 shrink-0", pkg.featured ? "text-white" : "text-ember")} stroke={3} />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <button onClick={onStart}
-                  className={classNames(
-                    "mt-6 w-full inline-flex items-center justify-center gap-2 font-semibold px-5 py-3 rounded-full transition-all",
-                    pkg.featured
-                      ? "bg-white text-plum hover:scale-[1.02]"
-                      : "sunset-bg text-white shadow-soft hover:shadow-lift"
-                  )}>
-                  Start with {pkg.name} <Icon name="arrowRight" className="w-4 h-4" />
-                </button>
-              </div>
-            ))}
-          </div>
-          <p className="mt-6 text-center text-sm text-ink/50">Prices in South African Rand (ZAR). Final quote depends on scope — no obligation.</p>
-        </section>
-      );
-    }
-
-    /* =========================================================
-       TESTIMONIAL  (REPLACE with a real client quote once you have one)
-       ========================================================= */
-    function Testimonial() {
-      return (
-        <section className="bg-ink text-white">
-          <div className="max-w-3xl mx-auto px-5 py-16 md:py-20 text-center">
-            <div className="text-5xl sunset-text font-black leading-none">"</div>
-            <blockquote className="mt-2 text-2xl md:text-3xl font-bold leading-snug">
-              {/* REPLACE: a real testimonial from your first client / friend */}
-              JVDE took our idea and had a working site live in under two weeks. Fast, easy to deal with, and it just works.
-            </blockquote>
-            <div className="mt-6 text-white/60">
-              {/* REPLACE: client name & business */}
-              <span className="font-semibold text-white">A happy first client</span> · Small business owner, Pretoria
-            </div>
-          </div>
-        </section>
-      );
-    }
-
-    /* =========================================================
-       FAQ (accordion)
-       ========================================================= */
-    function FAQ() {
-      const [open, setOpen] = useState(0);
-      return (
-        <section id="faq" className="max-w-3xl mx-auto px-5 py-16 md:py-24 scroll-mt-20">
-          <div className="text-center">
-            <h2 className="text-3xl md:text-4xl font-black text-ink">Questions, answered</h2>
-            <p className="mt-4 text-lg text-ink/70">The stuff people usually want to know before getting started.</p>
-          </div>
-          <div className="mt-10 space-y-3">
-            {FAQS.map((f, i) => {
-              const isOpen = open === i;
-              return (
-                <div key={i} className="rounded-2xl bg-white border border-black/5 shadow-soft overflow-hidden">
-                  <button onClick={() => setOpen(isOpen ? -1 : i)}
-                    className="w-full flex items-center justify-between gap-4 text-left px-5 py-4">
-                    <span className="font-semibold text-ink">{f.q}</span>
-                    <span className={classNames("shrink-0 text-plum transition-transform", isOpen ? "rotate-45" : "")}>
-                      <Icon name="x" className="w-5 h-5" />
-                    </span>
-                  </button>
-                  {isOpen && <div className="px-5 pb-5 -mt-1 text-ink/65 text-sm leading-relaxed animate-fade-up">{f.a}</div>}
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      );
-    }
-
-    /* =========================================================
-       RIVER — a winding watercourse that flows as you scroll.
-       - Fixed to the viewport, sits behind content (z-0).
-       - A glowing "tide" fills the river the further down you scroll.
-       - A little boat drifts along the river with your scroll position.
-       - The whole river gently sways toward your cursor.
-       - Always-on current animation via CSS dashes.
-       It's purely decorative (pointer-events-none) so it never blocks the UI.
-       ========================================================= */
-    function River() {
-      const [dims, setDims] = useState({
-        w: typeof window !== "undefined" ? window.innerWidth : 1200,
-        h: typeof window !== "undefined" ? window.innerHeight : 800,
-      });
-      const [swayX, setSwayX] = useState(0);
-
-      const baseRef = useRef(null);       // measured path
-      const tideRef = useRef(null);       // glowing fill that tracks scroll
-      const boatRef = useRef(null);       // drifting boat group
-      const lenRef = useRef(0);
-      const rafRef = useRef(0);
-
-      const { w, h } = dims;
-
-      // A winding river path generated from the viewport size (so 1 unit = 1px).
-      const d =
-        `M ${w * 0.30} ${-40} ` +
-        `C ${w * 0.02} ${h * 0.16}, ${w * 0.66} ${h * 0.30}, ${w * 0.38} ${h * 0.48} ` +
-        `S ${w * 0.06} ${h * 0.74}, ${w * 0.56} ${h * 0.90} ` +
-        `S ${w * 0.88} ${h * 1.06}, ${w * 0.64} ${h + 60}`;
-
-      // Position the tide-fill + boat for the current scroll progress.
-      const update = () => {
-        const path = baseRef.current;
-        // Guard: getPointAtLength is unavailable in a few odd environments.
-        if (!path || typeof path.getPointAtLength !== "function") return;
-        const len = lenRef.current || 1;
-        const max = document.documentElement.scrollHeight - window.innerHeight;
-        const p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
-
-        if (tideRef.current) tideRef.current.style.strokeDashoffset = String(len * (1 - p));
-
-        if (boatRef.current) {
-          const pt = path.getPointAtLength(len * p);
-          const pt2 = path.getPointAtLength(Math.min(len, len * p + 1));
-          const ang = Math.atan2(pt2.y - pt.y, pt2.x - pt.x) * 180 / Math.PI;
-          boatRef.current.setAttribute("transform", `translate(${pt.x} ${pt.y}) rotate(${ang})`);
-        }
-      };
-
-      // Re-measure whenever the path (viewport) changes.
-      useEffect(() => {
-        const path = baseRef.current;
-        if (!path || typeof path.getTotalLength !== "function") return;
-        const len = path.getTotalLength();
-        lenRef.current = len;
-        if (tideRef.current) {
-          tideRef.current.style.strokeDasharray = String(len);
-          tideRef.current.style.strokeDashoffset = String(len);
-        }
-        update();
-      }, [d]);
-
-      // Scroll → flow + boat (rAF-throttled, passive).
-      useEffect(() => {
-        const onScroll = () => {
-          if (rafRef.current) return;
-          rafRef.current = requestAnimationFrame(() => { rafRef.current = 0; update(); });
-        };
-        window.addEventListener("scroll", onScroll, { passive: true });
-        return () => window.removeEventListener("scroll", onScroll);
-      }, []);
-
-      // Resize → rebuild path.
-      useEffect(() => {
-        const onResize = () => setDims({ w: window.innerWidth, h: window.innerHeight });
-        window.addEventListener("resize", onResize);
-        return () => window.removeEventListener("resize", onResize);
-      }, []);
-
-      // Cursor → gentle sway.
-      useEffect(() => {
-        const onMove = (e) => setSwayX((e.clientX / window.innerWidth - 0.5) * 26);
-        window.addEventListener("mousemove", onMove, { passive: true });
-        return () => window.removeEventListener("mousemove", onMove);
-      }, []);
-
-      return (
-        <div aria-hidden="true" className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-          <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="w-full h-full"
-               style={{ transform: `translateX(${swayX}px)`, transition: "transform 0.5s ease-out" }}>
-            <defs>
-              <linearGradient id="riverGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#7c3aed" />
-                <stop offset="55%" stopColor="#fb7185" />
-                <stop offset="100%" stopColor="#f97316" />
-              </linearGradient>
-              <filter id="riverGlow" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="7" />
-              </filter>
-            </defs>
-
-            {/* soft outer glow */}
-            <path d={d} fill="none" stroke="url(#riverGrad)" strokeWidth="36" strokeLinecap="round" opacity="0.10" filter="url(#riverGlow)" />
-            {/* still water body (measured) */}
-            <path ref={baseRef} d={d} fill="none" stroke="url(#riverGrad)" strokeWidth="16" strokeLinecap="round" opacity="0.26" />
-            {/* glowing tide that fills as you scroll down */}
-            <path ref={tideRef} d={d} fill="none" stroke="url(#riverGrad)" strokeWidth="16" strokeLinecap="round" opacity="0.85" filter="url(#riverGlow)" />
-            {/* continuous current (animated dashes) */}
-            <path className="river-flow" d={d} fill="none" stroke="#ffffff" strokeWidth="3" strokeLinecap="round"
-                  opacity="0.28" style={{ strokeDasharray: "2 22", animation: "riverflow 1.4s linear infinite" }} />
-
-            {/* the boat */}
-            <g ref={boatRef}>
-              <circle r="11" fill="#ffffff" opacity="0.16" />
-              <path d="M -7 1 L 7 1 L 4.5 5.5 L -4.5 5.5 Z" fill="#ffffff" />
-              <path d="M 0 -11 L 0 1 L 7 -3 Z" fill="#f97316" />
-            </g>
-          </svg>
-        </div>
-      );
-    }
-
-    /* =========================================================
-       RIPPLES — tap / click anywhere and the water ripples out.
-       Decorative overlay, never blocks clicks (pointer-events-none).
-       ========================================================= */
-    function Ripples() {
-      const [ripples, setRipples] = useState([]);
-      const idRef = useRef(0);
-      useEffect(() => {
-        const onClick = (e) => {
-          const id = ++idRef.current;
-          setRipples(r => [...r, { id, x: e.clientX, y: e.clientY }]);
-          setTimeout(() => setRipples(r => r.filter(p => p.id !== id)), 900);
-        };
-        window.addEventListener("click", onClick);
-        return () => window.removeEventListener("click", onClick);
-      }, []);
-      return (
-        <div aria-hidden="true" className="fixed inset-0 z-50 pointer-events-none overflow-hidden">
-          {ripples.map(r => (
-            <span key={r.id} className="absolute rounded-full" style={{
-              left: r.x, top: r.y, width: 16, height: 16, marginLeft: -8, marginTop: -8,
-              border: "2px solid rgba(124,58,237,0.55)", animation: "ripple 0.9s ease-out forwards",
-            }} />
-          ))}
-        </div>
-      );
-    }
-
-    /* =========================================================
        APP
        ========================================================= */
     function App() {
       const [submitted, setSubmitted] = useState(null);
-      const builderRef = useRef(null);
+      const scrollToBuilder = () => { const el = document.getElementById("builder"); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); };
 
-      const scrollToBuilder = () => {
-        const el = document.getElementById("builder");
-        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-      };
+      const Chrome = ({ children }) => (
+        <div className="min-h-screen flex flex-col">
+          <Aurora /><River /><Ripples /><ScrollProgress /><WhatsAppFab />
+          <div className="relative z-10 flex flex-col flex-1">{children}</div>
+        </div>
+      );
 
       if (submitted) {
         return (
-          <div className="min-h-screen flex flex-col">
-            <River />
-            <Ripples />
-            <div className="relative z-10 flex-1 flex flex-col">
-              <Navbar onStart={scrollToBuilder} />
-              <main className="flex-1"><Confirmation payload={submitted} onReset={() => { setSubmitted(null); window.scrollTo({ top: 0 }); }} /></main>
-              <Footer />
-            </div>
-          </div>
+          <Chrome>
+            <Navbar onStart={scrollToBuilder} />
+            <main className="flex-1"><Confirmation payload={submitted} onReset={() => { setSubmitted(null); window.scrollTo({ top: 0 }); }} /></main>
+            <Footer />
+          </Chrome>
         );
       }
-
       return (
-        <div className="min-h-screen flex flex-col">
-          <River />
-          <Ripples />
-          <div className="relative z-10 flex flex-col">
-            <Navbar onStart={scrollToBuilder} />
-            <main className="flex-1">
-              <Hero onStart={scrollToBuilder} />
-              <ServicesOverview onStart={scrollToBuilder} />
-              <Process />
-              <WhyJVDE />
-              <Pricing onStart={scrollToBuilder} />
-              <Testimonial />
-              <FAQ />
-              <Builder onDone={(p) => { setSubmitted(p); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
-            </main>
-            <Footer />
-          </div>
-        </div>
+        <Chrome>
+          <Navbar onStart={scrollToBuilder} />
+          <main className="flex-1">
+            <Hero onStart={scrollToBuilder} />
+            <Marquee />
+            <Stats />
+            <ServicesOverview onStart={scrollToBuilder} />
+            <Work />
+            <Process />
+            <WhyJVDE />
+            <Pricing onStart={scrollToBuilder} />
+            <Testimonials />
+            <FAQ />
+            <Builder onDone={(p) => { setSubmitted(p); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
+          </main>
+          <Footer />
+        </Chrome>
       );
     }
 
