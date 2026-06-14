@@ -5,6 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>JVDE — Web & App Development Studio | Pretoria, South Africa</title>
   <meta name="description" content="JVDE builds websites, web apps, mobile apps and AI features for South African businesses. Tell us what you need and get a quote — fast." />
+  <meta name="theme-color" content="#6d28d9" />
+  <link rel="canonical" href="https://jsblake2007-rgb.github.io/jvde/" />
+
+  <!-- Open Graph / WhatsApp / social share preview.
+       REPLACE: og:url and og:image with your real domain + a 1200x630 share image. -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="JVDE" />
+  <meta property="og:title" content="JVDE — a site or app that works, and ships fast" />
+  <meta property="og:description" content="Pretoria web & app studio. Pick the services you need, describe your project, and get a quote straight to WhatsApp." />
+  <meta property="og:url" content="https://jsblake2007-rgb.github.io/jvde/" />
+  <meta property="og:image" content="https://jsblake2007-rgb.github.io/jvde/og-image.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="JVDE — a site or app that works, and ships fast" />
+  <meta name="twitter:description" content="Pretoria web & app studio. Get a quote straight to WhatsApp." />
+  <meta name="twitter:image" content="https://jsblake2007-rgb.github.io/jvde/og-image.png" />
 
   <!--
     ============================================================
@@ -20,51 +35,19 @@
     ============================================================
   -->
 
-  <!-- Tailwind Play CDN (fine for a static site / preview). -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    // Sunset-inspired palette: deep purple -> warm orange.
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            ink:    '#1c1530',   // deep near-black purple for text
-            plum:   '#6d28d9',   // deep purple accent
-            grape:  '#7c3aed',
-            coral:  '#fb7185',
-            ember:  '#f97316',   // warm orange accent
-            amber:  '#f59e0b',
-            sand:   '#fbf7f2',   // clean warm base
-          },
-          fontFamily: {
-            sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-          },
-          boxShadow: {
-            soft: '0 10px 30px -12px rgba(76, 29, 149, 0.25)',
-            lift: '0 20px 50px -18px rgba(124, 58, 237, 0.35)',
-          },
-          keyframes: {
-            'fade-up': {
-              '0%':   { opacity: '0', transform: 'translateY(12px)' },
-              '100%': { opacity: '1', transform: 'translateY(0)' },
-            },
-          },
-          animation: {
-            'fade-up': 'fade-up 0.5s ease-out both',
-          },
-        },
-      },
-    };
-  </script>
+  <!-- Tailwind: precompiled, static stylesheet (no runtime, works offline).
+       Regenerate after editing classes:  see /build/ in the repo. -->
+  <link rel="stylesheet" href="./styles.css" />
 
+  <!-- Web font (degrades gracefully to the system sans stack if offline). -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-  <!-- React + Babel for in-browser JSX (self-contained, no build step). -->
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- React + Babel, vendored locally so the site needs NO external CDN. -->
+  <script src="./vendor/react.production.min.js"></script>
+  <script src="./vendor/react-dom.production.min.js"></script>
+  <script src="./vendor/babel.min.js"></script>
 
   <style>
     html { scroll-behavior: smooth; }
@@ -89,7 +72,18 @@
   </style>
 </head>
 <body>
-  <div id="root"></div>
+  <div id="root">
+    <!-- Replaced by React once it mounts. Shown briefly while scripts load. -->
+    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:Inter,system-ui,sans-serif;color:#6d28d9;font-weight:700">
+      Loading JVDE…
+    </div>
+  </div>
+  <noscript>
+    <div style="max-width:40rem;margin:4rem auto;padding:0 1.25rem;font-family:system-ui,sans-serif;color:#1c1530;text-align:center">
+      <h1>JVDE — Web &amp; App Development Studio</h1>
+      <p>This site needs JavaScript enabled. Please turn it on, or reach us on WhatsApp.</p>
+    </div>
+  </noscript>
 
   <script type="text/babel" data-presets="react">
     const { useState, useRef, useEffect } = React;
@@ -125,6 +119,56 @@
     const CONTACT_METHODS = ["WhatsApp", "Email", "Call"];
 
     const STEPS = ["Services", "Project", "Your details", "Review"];
+
+    /* ---------------------------------------------------------
+       HOW IT WORKS — edit freely.
+       --------------------------------------------------------- */
+    const PROCESS = [
+      { icon: "whatsapp", title: "Chat",   desc: "Send your request — we reply fast on WhatsApp." },
+      { icon: "edit",     title: "Quote",  desc: "A clear, no-jargon quote and timeline." },
+      { icon: "code",     title: "Build",  desc: "We design and build, sharing progress as we go." },
+      { icon: "rocket",   title: "Launch", desc: "We ship it live and keep it running smoothly." },
+    ];
+
+    /* ---------------------------------------------------------
+       PRICING / PACKAGES — edit prices & features freely.
+       These are starting guides; the builder still sends a custom request.
+       --------------------------------------------------------- */
+    const PACKAGES = [
+      {
+        name: "Starter",
+        price: "From R6k",
+        tagline: "A sharp single-page site to get you online.",
+        features: ["1-page modern site", "Mobile-first design", "Contact / WhatsApp button", "Basic SEO setup", "2 rounds of changes"],
+        featured: false,
+      },
+      {
+        name: "Standard",
+        price: "From R18k",
+        tagline: "A full site or web app built around your business.",
+        features: ["Multi-page site or web app", "Custom design & branding", "Lead / enquiry forms", "AI feature or automation", "Performance & SEO", "3 rounds of changes"],
+        featured: true,
+      },
+      {
+        name: "Custom",
+        price: "Let's talk",
+        tagline: "Bigger builds — mobile apps, e-commerce, the works.",
+        features: ["Mobile app (iOS & Android)", "E-commerce / online store", "Advanced AI integration", "Ongoing support retainer", "Scoped to exactly your needs"],
+        featured: false,
+      },
+    ];
+
+    /* ---------------------------------------------------------
+       FAQ — edit freely.
+       --------------------------------------------------------- */
+    const FAQS = [
+      { q: "How long does it take?", a: "Most sites ship in 1–3 weeks depending on scope. We agree a timeline upfront and keep you posted — no months of silence." },
+      { q: "Do I own the code and the site?", a: "Yes. Once it's paid up, it's yours — code, content and accounts. No lock-in." },
+      { q: "What about hosting and a domain?", a: "We can set both up for you. Hosting is often very cheap (sometimes free for simple sites), and a .co.za domain is around R150/year." },
+      { q: "How do payments work?", a: "Usually a 50% deposit to start and the balance on delivery. We'll confirm everything in writing before any work begins." },
+      { q: "Can you add AI features?", a: "Absolutely — chatbots, smart search, automation and AI-assisted content are some of our favourite things to build." },
+      { q: "Will it work on phones?", a: "Always. Everything is mobile-first, because that's how most South Africans browse." },
+    ];
 
     /* =========================================================
        ICONS — minimal lucide-style inline SVGs (self-contained)
@@ -179,7 +223,8 @@
       const [open, setOpen] = useState(false);
       const links = [
         { href: "#services", label: "Services" },
-        { href: "#why", label: "Why JVDE" },
+        { href: "#pricing", label: "Pricing" },
+        { href: "#faq", label: "FAQ" },
         { href: "#builder", label: "Get a quote" },
       ];
       return (
@@ -744,6 +789,137 @@
     }
 
     /* =========================================================
+       HOW IT WORKS (process strip)
+       ========================================================= */
+    function Process() {
+      return (
+        <section className="max-w-6xl mx-auto px-5 py-12 md:py-16">
+          <div className="rounded-3xl bg-white border border-black/5 shadow-soft p-6 sm:p-10">
+            <h2 className="text-2xl md:text-3xl font-black text-ink text-center">How it works</h2>
+            <p className="mt-2 text-center text-ink/60">From "hello" to live in four simple steps.</p>
+            <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {PROCESS.map((p, i) => (
+                <div key={p.title} className="relative text-center">
+                  <div className="w-14 h-14 mx-auto rounded-2xl sunset-bg text-white inline-flex items-center justify-center shadow-soft">
+                    <Icon name={p.icon} />
+                  </div>
+                  <div className="mt-3 text-xs font-bold tracking-wide uppercase text-plum">Step {i + 1}</div>
+                  <h3 className="mt-1 font-bold text-ink">{p.title}</h3>
+                  <p className="mt-1 text-sm text-ink/60">{p.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    /* =========================================================
+       PRICING / PACKAGES
+       ========================================================= */
+    function Pricing({ onStart }) {
+      return (
+        <section id="pricing" className="max-w-6xl mx-auto px-5 py-16 md:py-24 scroll-mt-20">
+          <div className="max-w-2xl mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-black text-ink">Simple, honest pricing</h2>
+            <p className="mt-4 text-lg text-ink/70">
+              Starting guides, not surprises. Every project gets a clear quote upfront — pick a starting point and we'll tailor it to you.
+            </p>
+          </div>
+          <div className="mt-12 grid md:grid-cols-3 gap-5 items-start">
+            {PACKAGES.map(pkg => (
+              <div key={pkg.name}
+                className={classNames(
+                  "rounded-3xl p-7 border transition-all",
+                  pkg.featured
+                    ? "sunset-bg text-white border-transparent shadow-lift md:-translate-y-2"
+                    : "bg-white text-ink border-black/10 shadow-soft hover:-translate-y-1"
+                )}>
+                {pkg.featured && (
+                  <span className="inline-block text-xs font-bold uppercase tracking-wide bg-white/20 px-3 py-1 rounded-full mb-3">Most popular</span>
+                )}
+                <h3 className={classNames("text-xl font-black", pkg.featured ? "text-white" : "text-ink")}>{pkg.name}</h3>
+                <div className={classNames("mt-2 text-3xl font-black", pkg.featured ? "text-white" : "sunset-text")}>{pkg.price}</div>
+                <p className={classNames("mt-2 text-sm", pkg.featured ? "text-white/80" : "text-ink/60")}>{pkg.tagline}</p>
+                <ul className="mt-5 space-y-2.5">
+                  {pkg.features.map(f => (
+                    <li key={f} className={classNames("flex items-start gap-2 text-sm", pkg.featured ? "text-white/90" : "text-ink/75")}>
+                      <Icon name="check" className={classNames("w-4 h-4 mt-0.5 shrink-0", pkg.featured ? "text-white" : "text-ember")} stroke={3} />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <button onClick={onStart}
+                  className={classNames(
+                    "mt-6 w-full inline-flex items-center justify-center gap-2 font-semibold px-5 py-3 rounded-full transition-all",
+                    pkg.featured
+                      ? "bg-white text-plum hover:scale-[1.02]"
+                      : "sunset-bg text-white shadow-soft hover:shadow-lift"
+                  )}>
+                  Start with {pkg.name} <Icon name="arrowRight" className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+          <p className="mt-6 text-center text-sm text-ink/50">Prices in South African Rand (ZAR). Final quote depends on scope — no obligation.</p>
+        </section>
+      );
+    }
+
+    /* =========================================================
+       TESTIMONIAL  (REPLACE with a real client quote once you have one)
+       ========================================================= */
+    function Testimonial() {
+      return (
+        <section className="bg-ink text-white">
+          <div className="max-w-3xl mx-auto px-5 py-16 md:py-20 text-center">
+            <div className="text-5xl sunset-text font-black leading-none">"</div>
+            <blockquote className="mt-2 text-2xl md:text-3xl font-bold leading-snug">
+              {/* REPLACE: a real testimonial from your first client / friend */}
+              JVDE took our idea and had a working site live in under two weeks. Fast, easy to deal with, and it just works.
+            </blockquote>
+            <div className="mt-6 text-white/60">
+              {/* REPLACE: client name & business */}
+              <span className="font-semibold text-white">A happy first client</span> · Small business owner, Pretoria
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    /* =========================================================
+       FAQ (accordion)
+       ========================================================= */
+    function FAQ() {
+      const [open, setOpen] = useState(0);
+      return (
+        <section id="faq" className="max-w-3xl mx-auto px-5 py-16 md:py-24 scroll-mt-20">
+          <div className="text-center">
+            <h2 className="text-3xl md:text-4xl font-black text-ink">Questions, answered</h2>
+            <p className="mt-4 text-lg text-ink/70">The stuff people usually want to know before getting started.</p>
+          </div>
+          <div className="mt-10 space-y-3">
+            {FAQS.map((f, i) => {
+              const isOpen = open === i;
+              return (
+                <div key={i} className="rounded-2xl bg-white border border-black/5 shadow-soft overflow-hidden">
+                  <button onClick={() => setOpen(isOpen ? -1 : i)}
+                    className="w-full flex items-center justify-between gap-4 text-left px-5 py-4">
+                    <span className="font-semibold text-ink">{f.q}</span>
+                    <span className={classNames("shrink-0 text-plum transition-transform", isOpen ? "rotate-45" : "")}>
+                      <Icon name="x" className="w-5 h-5" />
+                    </span>
+                  </button>
+                  {isOpen && <div className="px-5 pb-5 -mt-1 text-ink/65 text-sm leading-relaxed animate-fade-up">{f.a}</div>}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      );
+    }
+
+    /* =========================================================
        RIVER — a winding watercourse that flows as you scroll.
        - Fixed to the viewport, sits behind content (z-0).
        - A glowing "tide" fills the river the further down you scroll.
@@ -777,7 +953,8 @@
       // Position the tide-fill + boat for the current scroll progress.
       const update = () => {
         const path = baseRef.current;
-        if (!path) return;
+        // Guard: getPointAtLength is unavailable in a few odd environments.
+        if (!path || typeof path.getPointAtLength !== "function") return;
         const len = lenRef.current || 1;
         const max = document.documentElement.scrollHeight - window.innerHeight;
         const p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
@@ -795,7 +972,7 @@
       // Re-measure whenever the path (viewport) changes.
       useEffect(() => {
         const path = baseRef.current;
-        if (!path) return;
+        if (!path || typeof path.getTotalLength !== "function") return;
         const len = path.getTotalLength();
         lenRef.current = len;
         if (tideRef.current) {
@@ -928,7 +1105,11 @@
             <main className="flex-1">
               <Hero onStart={scrollToBuilder} />
               <ServicesOverview onStart={scrollToBuilder} />
+              <Process />
               <WhyJVDE />
+              <Pricing onStart={scrollToBuilder} />
+              <Testimonial />
+              <FAQ />
               <Builder onDone={(p) => { setSubmitted(p); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
             </main>
             <Footer />
