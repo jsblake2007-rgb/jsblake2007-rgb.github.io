@@ -79,6 +79,13 @@
     .sunset-bg {
       background: linear-gradient(120deg, #6d28d9 0%, #9333ea 40%, #fb7185 75%, #f97316 100%);
     }
+    /* River: continuous "current" flow along the path */
+    @keyframes riverflow { to { stroke-dashoffset: -24; } }
+    /* Water ripples that spawn on tap/click */
+    @keyframes ripple { to { transform: scale(9); opacity: 0; } }
+    @media (prefers-reduced-motion: reduce) {
+      .river-flow { animation: none !important; }
+    }
   </style>
 </head>
 <body>
@@ -490,7 +497,7 @@
       const selectedServices = data.services.map(id => SERVICES.find(s => s.id === id)).filter(Boolean);
 
       return (
-        <section id="builder" className="bg-sand">
+        <section id="builder">
           <div ref={topRef} className="max-w-3xl mx-auto px-5 py-16 md:py-24 scroll-mt-20">
             <div className="text-center mb-8">
               <h2 className="text-3xl md:text-4xl font-black text-ink">Build your project</h2>
@@ -668,7 +675,7 @@
     function Confirmation({ payload, onReset }) {
       const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi JVDE, I just sent a project request 👋")}`;
       return (
-        <section className="bg-sand">
+        <section>
           <div className="max-w-2xl mx-auto px-5 py-20 md:py-28 text-center animate-fade-up">
             <div className="w-20 h-20 rounded-full sunset-bg text-white inline-flex items-center justify-center shadow-lift">
               <Icon name="check" className="w-10 h-10" stroke={3} />
@@ -737,6 +744,156 @@
     }
 
     /* =========================================================
+       RIVER — a winding watercourse that flows as you scroll.
+       - Fixed to the viewport, sits behind content (z-0).
+       - A glowing "tide" fills the river the further down you scroll.
+       - A little boat drifts along the river with your scroll position.
+       - The whole river gently sways toward your cursor.
+       - Always-on current animation via CSS dashes.
+       It's purely decorative (pointer-events-none) so it never blocks the UI.
+       ========================================================= */
+    function River() {
+      const [dims, setDims] = useState({
+        w: typeof window !== "undefined" ? window.innerWidth : 1200,
+        h: typeof window !== "undefined" ? window.innerHeight : 800,
+      });
+      const [swayX, setSwayX] = useState(0);
+
+      const baseRef = useRef(null);       // measured path
+      const tideRef = useRef(null);       // glowing fill that tracks scroll
+      const boatRef = useRef(null);       // drifting boat group
+      const lenRef = useRef(0);
+      const rafRef = useRef(0);
+
+      const { w, h } = dims;
+
+      // A winding river path generated from the viewport size (so 1 unit = 1px).
+      const d =
+        `M ${w * 0.30} ${-40} ` +
+        `C ${w * 0.02} ${h * 0.16}, ${w * 0.66} ${h * 0.30}, ${w * 0.38} ${h * 0.48} ` +
+        `S ${w * 0.06} ${h * 0.74}, ${w * 0.56} ${h * 0.90} ` +
+        `S ${w * 0.88} ${h * 1.06}, ${w * 0.64} ${h + 60}`;
+
+      // Position the tide-fill + boat for the current scroll progress.
+      const update = () => {
+        const path = baseRef.current;
+        if (!path) return;
+        const len = lenRef.current || 1;
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+
+        if (tideRef.current) tideRef.current.style.strokeDashoffset = String(len * (1 - p));
+
+        if (boatRef.current) {
+          const pt = path.getPointAtLength(len * p);
+          const pt2 = path.getPointAtLength(Math.min(len, len * p + 1));
+          const ang = Math.atan2(pt2.y - pt.y, pt2.x - pt.x) * 180 / Math.PI;
+          boatRef.current.setAttribute("transform", `translate(${pt.x} ${pt.y}) rotate(${ang})`);
+        }
+      };
+
+      // Re-measure whenever the path (viewport) changes.
+      useEffect(() => {
+        const path = baseRef.current;
+        if (!path) return;
+        const len = path.getTotalLength();
+        lenRef.current = len;
+        if (tideRef.current) {
+          tideRef.current.style.strokeDasharray = String(len);
+          tideRef.current.style.strokeDashoffset = String(len);
+        }
+        update();
+      }, [d]);
+
+      // Scroll → flow + boat (rAF-throttled, passive).
+      useEffect(() => {
+        const onScroll = () => {
+          if (rafRef.current) return;
+          rafRef.current = requestAnimationFrame(() => { rafRef.current = 0; update(); });
+        };
+        window.addEventListener("scroll", onScroll, { passive: true });
+        return () => window.removeEventListener("scroll", onScroll);
+      }, []);
+
+      // Resize → rebuild path.
+      useEffect(() => {
+        const onResize = () => setDims({ w: window.innerWidth, h: window.innerHeight });
+        window.addEventListener("resize", onResize);
+        return () => window.removeEventListener("resize", onResize);
+      }, []);
+
+      // Cursor → gentle sway.
+      useEffect(() => {
+        const onMove = (e) => setSwayX((e.clientX / window.innerWidth - 0.5) * 26);
+        window.addEventListener("mousemove", onMove, { passive: true });
+        return () => window.removeEventListener("mousemove", onMove);
+      }, []);
+
+      return (
+        <div aria-hidden="true" className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+          <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="w-full h-full"
+               style={{ transform: `translateX(${swayX}px)`, transition: "transform 0.5s ease-out" }}>
+            <defs>
+              <linearGradient id="riverGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#7c3aed" />
+                <stop offset="55%" stopColor="#fb7185" />
+                <stop offset="100%" stopColor="#f97316" />
+              </linearGradient>
+              <filter id="riverGlow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="7" />
+              </filter>
+            </defs>
+
+            {/* soft outer glow */}
+            <path d={d} fill="none" stroke="url(#riverGrad)" strokeWidth="36" strokeLinecap="round" opacity="0.10" filter="url(#riverGlow)" />
+            {/* still water body (measured) */}
+            <path ref={baseRef} d={d} fill="none" stroke="url(#riverGrad)" strokeWidth="16" strokeLinecap="round" opacity="0.26" />
+            {/* glowing tide that fills as you scroll down */}
+            <path ref={tideRef} d={d} fill="none" stroke="url(#riverGrad)" strokeWidth="16" strokeLinecap="round" opacity="0.85" filter="url(#riverGlow)" />
+            {/* continuous current (animated dashes) */}
+            <path className="river-flow" d={d} fill="none" stroke="#ffffff" strokeWidth="3" strokeLinecap="round"
+                  opacity="0.28" style={{ strokeDasharray: "2 22", animation: "riverflow 1.4s linear infinite" }} />
+
+            {/* the boat */}
+            <g ref={boatRef}>
+              <circle r="11" fill="#ffffff" opacity="0.16" />
+              <path d="M -7 1 L 7 1 L 4.5 5.5 L -4.5 5.5 Z" fill="#ffffff" />
+              <path d="M 0 -11 L 0 1 L 7 -3 Z" fill="#f97316" />
+            </g>
+          </svg>
+        </div>
+      );
+    }
+
+    /* =========================================================
+       RIPPLES — tap / click anywhere and the water ripples out.
+       Decorative overlay, never blocks clicks (pointer-events-none).
+       ========================================================= */
+    function Ripples() {
+      const [ripples, setRipples] = useState([]);
+      const idRef = useRef(0);
+      useEffect(() => {
+        const onClick = (e) => {
+          const id = ++idRef.current;
+          setRipples(r => [...r, { id, x: e.clientX, y: e.clientY }]);
+          setTimeout(() => setRipples(r => r.filter(p => p.id !== id)), 900);
+        };
+        window.addEventListener("click", onClick);
+        return () => window.removeEventListener("click", onClick);
+      }, []);
+      return (
+        <div aria-hidden="true" className="fixed inset-0 z-50 pointer-events-none overflow-hidden">
+          {ripples.map(r => (
+            <span key={r.id} className="absolute rounded-full" style={{
+              left: r.x, top: r.y, width: 16, height: 16, marginLeft: -8, marginTop: -8,
+              border: "2px solid rgba(124,58,237,0.55)", animation: "ripple 0.9s ease-out forwards",
+            }} />
+          ))}
+        </div>
+      );
+    }
+
+    /* =========================================================
        APP
        ========================================================= */
     function App() {
@@ -751,23 +908,31 @@
       if (submitted) {
         return (
           <div className="min-h-screen flex flex-col">
-            <Navbar onStart={scrollToBuilder} />
-            <main className="flex-1"><Confirmation payload={submitted} onReset={() => { setSubmitted(null); window.scrollTo({ top: 0 }); }} /></main>
-            <Footer />
+            <River />
+            <Ripples />
+            <div className="relative z-10 flex-1 flex flex-col">
+              <Navbar onStart={scrollToBuilder} />
+              <main className="flex-1"><Confirmation payload={submitted} onReset={() => { setSubmitted(null); window.scrollTo({ top: 0 }); }} /></main>
+              <Footer />
+            </div>
           </div>
         );
       }
 
       return (
         <div className="min-h-screen flex flex-col">
-          <Navbar onStart={scrollToBuilder} />
-          <main className="flex-1">
-            <Hero onStart={scrollToBuilder} />
-            <ServicesOverview onStart={scrollToBuilder} />
-            <WhyJVDE />
-            <Builder onDone={(p) => { setSubmitted(p); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
-          </main>
-          <Footer />
+          <River />
+          <Ripples />
+          <div className="relative z-10 flex flex-col">
+            <Navbar onStart={scrollToBuilder} />
+            <main className="flex-1">
+              <Hero onStart={scrollToBuilder} />
+              <ServicesOverview onStart={scrollToBuilder} />
+              <WhyJVDE />
+              <Builder onDone={(p) => { setSubmitted(p); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
+            </main>
+            <Footer />
+          </div>
         </div>
       );
     }
